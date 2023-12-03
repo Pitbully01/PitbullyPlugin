@@ -2,10 +2,10 @@ name: PitbullyPlugin
 version: '${project.version}'
 main: de.pitbully.pitbullyplugin.PitbullyPlugin
 api-version: '1.20'
-prefix: [logpre]
-authors: [aa]
+prefix: [PitbullyPlugin]
+authors: [Pitbully01]
 description: a
-website: http:aa
+website: https://safekane.de
 commands:
   home:
     permission: pit.home
