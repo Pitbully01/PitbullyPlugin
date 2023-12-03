@@ -11,17 +11,18 @@ import org.jetbrains.annotations.NotNull;
 
 public class DeleteHomeCommand implements CommandExecutor {
     private JavaPlugin plugin;
+
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         if (!(commandSender instanceof Player)) {
             return true;
         } else {
             Player player = (Player) commandSender;
-            if(Locations.checkHomeLocation(player.getUniqueId())) {
+            if (Locations.checkHomeLocation(player.getUniqueId())) {
                 Locations.deleteHomeLocation(player.getUniqueId());
                 player.sendMessage("Home gelöscht? :(");
                 plugin = PitbullyPlugin.getInstance();
                 plugin.saveConfig();
-            }else{
+            } else {
                 player.sendMessage("§cKein Home Gesetzt? :(");
             }
             return false;
