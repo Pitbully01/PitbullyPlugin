@@ -1,0 +1,17 @@
+name: PitbullyPlugin
+version: '${project.version}'
+main: de.pitbully.pitbullyplugin.PitbullyPlugin
+api-version: '1.20'
+prefix: [logpre]
+authors: [aa]
+description: a
+website: http:aa
+commands:
+  home:
+    permission: pit.home
+  sethome:
+    permission: pit.sethome
+  delhome:
+    permission: pit.delhome
+  back:
+    permission: pit.back
