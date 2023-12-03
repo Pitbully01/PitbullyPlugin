@@ -4,6 +4,7 @@ import de.pitbully.pitbullyplugin.commands.*;
 import de.pitbully.pitbullyplugin.listeners.LocationListener;
 import de.pitbully.pitbullyplugin.utils.Locations;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -49,14 +50,19 @@ public final class PitbullyPlugin extends JavaPlugin {
     private void registerCommands() {
         registerCommand("home", new HomeCommand());
         registerCommand("sethome", new SetHomeCommand());
-        registerCommand("delhome", new DeleteHomeCommand());
+        registerCommand("delhome", new DelHomeCommand());
         registerCommand("back", new BackCommand());
-        ;
+        registerCommand("setwarp", new SetWarpCommand());
 
     }
 
     private void registerCommand(String command, CommandExecutor CommandExecutor) {
         Objects.requireNonNull(getCommand(command)).setExecutor(CommandExecutor);
+    }
+
+    private void registerCommand(String command, CommandExecutor CommandExecutor, TabCompleter TabCompleter) {
+        Objects.requireNonNull(getCommand(command)).setTabCompleter(TabCompleter);
+        registerCommand(command, CommandExecutor);
     }
 
     private void loadConfig() {

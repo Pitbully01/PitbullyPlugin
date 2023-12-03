@@ -13,6 +13,7 @@ public class Locations {
     private static HashMap<UUID, Location> lastTeleportLocations = new HashMap<>();
     private static HashMap<UUID, Location> lastLocations = new HashMap<>();
     private static HashMap<UUID, Location> homeLocations = new HashMap<>();
+    private static HashMap<String, Location> warpLocations = new HashMap<>();
 
 
     public static void updateLastDeathLocations(UUID playerId, Location location) {
@@ -50,7 +51,6 @@ public class Locations {
     }
 
     public static Location getHomeLocation(UUID playerId) {
-
         return homeLocations.get(playerId);
     }
 
@@ -59,8 +59,29 @@ public class Locations {
     }
 
     public static void deleteHomeLocation(UUID playerId) {
-
         homeLocations.remove(playerId);
+
+    }
+
+    public static void updateWarpLocation(String warp, Location location) {
+        warpLocations.put(warp, location);
+    }
+
+    public static Location getWarpLocation(String warp) {
+        return warpLocations.get(warp);
+    }
+
+    public static HashMap<String, Location> getWarpHashMap() {
+        return warpLocations;
+    }
+
+    public static boolean checkWarpLocation(String warp) {
+        return warpLocations.containsKey(warp);
+    }
+
+    public static void deleteWarpLocation(String warp) {
+
+        warpLocations.remove(warp);
 
     }
 
@@ -92,6 +113,13 @@ public class Locations {
             Location location = (Location) config.get("homeLocations." + key);
             homeLocations.put(playerId, location);
         }
+
+        // Load WarpLocations
+        for (String key : Objects.requireNonNull(config.getConfigurationSection("warpLocations")).getKeys(false)) {
+            Location location = (Location) config.get("warpLocations." + key);
+            warpLocations.put(key, location);
+        }
+
     }
 
     public static void saveToConfig(FileConfiguration config) {
@@ -113,6 +141,11 @@ public class Locations {
         // Save homeLocations
         for (UUID playerId : homeLocations.keySet()) {
             config.set("homeLocations." + playerId, homeLocations.get(playerId));
+        }
+
+        // Save warpLocations
+        for (String warpName : warpLocations.keySet()) {
+            config.set("warpLocations." + warpName, warpLocations.get(warpName));
         }
     }
 

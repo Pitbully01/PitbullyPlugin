@@ -7,11 +7,13 @@ authors: [Pitbully01]
 description: a
 website: https://safekane.de
 commands:
+  back:
+    permission: pit.back
   home:
     permission: pit.home
   sethome:
     permission: pit.sethome
   delhome:
     permission: pit.delhome
-  back:
-    permission: pit.back
+  setwarp:
+    permission: pit.setwarp

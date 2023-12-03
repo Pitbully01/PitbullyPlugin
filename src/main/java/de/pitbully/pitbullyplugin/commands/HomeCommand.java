@@ -20,9 +20,9 @@ public class HomeCommand implements CommandExecutor {
 
             if (Locations.checkHomeLocation(player.getUniqueId())) {
                 player.teleport(Objects.requireNonNull(Locations.getHomeLocation(player.getUniqueId())));
-                player.sendMessage("Du wurdest zurück nach ♥Hause♥ Teleportiert! :)");
+                player.sendMessage("Du wurdest zurück nach ♥Hause♥ teleportiert! :)");
             } else {
-                player.sendMessage("§cKein Home Gesetzt");
+                player.sendMessage("§cKein Home gesetzt");
             }
 
             return false;
