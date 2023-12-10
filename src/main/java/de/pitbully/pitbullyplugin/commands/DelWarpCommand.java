@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class SetWarpCommand implements CommandExecutor {
+public class DelWarpCommand implements CommandExecutor {
     private JavaPlugin plugin;
 
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
@@ -30,16 +30,15 @@ public class SetWarpCommand implements CommandExecutor {
 
     private void execute(Player player, String[] args) {
         if(args.length != 1){
-            player.sendMessage("zu wenig oder zu viele argumente" + args.length);
+            player.sendMessage("zu wenig oder zu viele argumente");
             return;
         }
         String warp = args[0];
-        if(Locations.checkWarpLocation(warp)) {
-            player.sendMessage("Der Warp " + warp + " existiert bereits, bitte lösche ihn um ihn neu zu setzen");
+        if(!Locations.checkWarpLocation(warp)) {
+            player.sendMessage("Der Warp " + warp + " existiert nicht :(");
             return;
         }
-        player.sendMessage("Der Warp " + warp + " wurde gesetzt! :)");
-        Locations.updateWarpLocation(warp, player.getLocation());
-
+        player.sendMessage("Der Warp " + warp + " wurde gelöscht! :)");
+        Locations.deleteWarpLocation(warp);
     }
 }

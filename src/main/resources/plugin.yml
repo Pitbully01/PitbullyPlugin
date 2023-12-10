@@ -17,3 +17,7 @@ commands:
     permission: pit.delhome
   setwarp:
     permission: pit.setwarp
+  delwarp:
+    permission: pit.delwarp
+  warp:
+    permission: pit.warp

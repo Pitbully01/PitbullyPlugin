@@ -1,7 +1,9 @@
 package de.pitbully.pitbullyplugin.utils;
 
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -87,37 +89,52 @@ public class Locations {
 
     public static void loadFromConfig(FileConfiguration config) {
         // Load lastDeathLocations
-        for (String key : Objects.requireNonNull(config.getConfigurationSection("lastDeathLocations")).getKeys(false)) {
-            UUID playerId = UUID.fromString(key);
-            Location location = (Location) config.get("lastDeathLocations." + key);
-            lastDeathLocations.put(playerId, location);
+        ConfigurationSection lastDeathSection = config.getConfigurationSection("lastDeathLocations");
+        if (lastDeathSection != null) {
+            for (String key : Objects.requireNonNull(config.getConfigurationSection("lastDeathLocations")).getKeys(false)) {
+                UUID playerId = UUID.fromString(key);
+                Location location = (Location) config.get("lastDeathLocations." + key);
+                lastDeathLocations.put(playerId, location);
+            }
         }
 
         // Load lastTeleportLocations
-        for (String key : Objects.requireNonNull(config.getConfigurationSection("lastTeleportLocations")).getKeys(false)) {
-            UUID playerId = UUID.fromString(key);
-            Location location = (Location) config.get("lastTeleportLocations." + key);
-            lastTeleportLocations.put(playerId, location);
+        ConfigurationSection lastTeleportSection = config.getConfigurationSection("lastTeleportLocations");
+        if (lastTeleportSection != null) {
+            for (String key : Objects.requireNonNull(config.getConfigurationSection("lastTeleportLocations")).getKeys(false)) {
+                UUID playerId = UUID.fromString(key);
+                Location location = (Location) config.get("lastTeleportLocations." + key);
+                lastTeleportLocations.put(playerId, location);
+            }
         }
 
         // Load lastLocations
-        for (String key : Objects.requireNonNull(config.getConfigurationSection("lastLocations")).getKeys(false)) {
-            UUID playerId = UUID.fromString(key);
-            Location location = (Location) config.get("lastLocations." + key);
-            lastLocations.put(playerId, location);
+        ConfigurationSection lastSection = config.getConfigurationSection("lastLocations");
+        if (lastSection != null) {
+            for (String key : Objects.requireNonNull(config.getConfigurationSection("lastLocations")).getKeys(false)) {
+                UUID playerId = UUID.fromString(key);
+                Location location = (Location) config.get("lastLocations." + key);
+                lastLocations.put(playerId, location);
+            }
         }
 
         // Load homeLocations
-        for (String key : Objects.requireNonNull(config.getConfigurationSection("homeLocations")).getKeys(false)) {
-            UUID playerId = UUID.fromString(key);
-            Location location = (Location) config.get("homeLocations." + key);
-            homeLocations.put(playerId, location);
+        ConfigurationSection homeSection = config.getConfigurationSection("homeLocations");
+        if (homeSection != null) {
+            for (String key : Objects.requireNonNull(config.getConfigurationSection("homeLocations")).getKeys(false)) {
+                UUID playerId = UUID.fromString(key);
+                Location location = (Location) config.get("homeLocations." + key);
+                homeLocations.put(playerId, location);
+            }
         }
 
         // Load WarpLocations
-        for (String key : Objects.requireNonNull(config.getConfigurationSection("warpLocations")).getKeys(false)) {
-            Location location = (Location) config.get("warpLocations." + key);
-            warpLocations.put(key, location);
+        ConfigurationSection warpSection = config.getConfigurationSection("warpLocations");
+        if (warpSection != null) {
+            for (String key : Objects.requireNonNull(config.getConfigurationSection("warpLocations")).getKeys(false)) {
+                Location location = (Location) config.get("warpLocations." + key);
+                warpLocations.put(key, location);
+            }
         }
 
     }
