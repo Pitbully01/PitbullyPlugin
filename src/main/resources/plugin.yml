@@ -7,17 +7,14 @@ authors: [Pitbully01]
 description: a
 website: https://safekane.de
 commands:
-  back:
-    permission: pit.back
-  home:
-    permission: pit.home
-  sethome:
-    permission: pit.sethome
-  delhome:
-    permission: pit.delhome
-  setwarp:
-    permission: pit.setwarp
-  delwarp:
-    permission: pit.delwarp
-  warp:
-    permission: pit.warp
+  back: {}
+  home: {}
+  sethome: {}
+  delhome: {}
+  setwarp: {}
+  delwarp: {}
+  warp: {}
+  enderchest:
+    aliases: [ec]
+  workbench:
+    aliases: [wb]

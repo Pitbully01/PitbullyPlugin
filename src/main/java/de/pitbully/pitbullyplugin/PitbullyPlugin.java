@@ -1,5 +1,6 @@
 package de.pitbully.pitbullyplugin;
-
+/*TODO:/wb workbench, /tpa
+*/
 import de.pitbully.pitbullyplugin.commands.*;
 import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
 import de.pitbully.pitbullyplugin.listeners.LocationListener;
@@ -13,12 +14,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-
+/**
+ * Main class for the PitbullyPlugin Bukkit plugin.
+ * This class extends JavaPlugin and serves as the entry point for the plugin.
+ *
+ * @author Pitbully01
+ */
 public final class PitbullyPlugin extends JavaPlugin {
     private static PitbullyPlugin instance;
     private File configFile;
     private FileConfiguration config;
 
+    /**
+     * Plugin startup logic.
+     * Registers commands, initializes configuration, and loads configuration from file.
+     */
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -30,6 +40,10 @@ public final class PitbullyPlugin extends JavaPlugin {
         loadConfig();
     }
 
+    /**
+     * Initializes the plugin configuration if it is not already initialized.
+     * This method is called during the plugin startup logic.
+     */
     private void initConfig() {
         if (config == null) {
             configFile = new File(getDataFolder(), "config.yml");
@@ -38,10 +52,19 @@ public final class PitbullyPlugin extends JavaPlugin {
 
     }
 
+    /**
+     * Retrieves the instance of the PitbullyPlugin.
+     *
+     * @return The instance of the PitbullyPlugin.
+     */
     public static PitbullyPlugin getInstance() {
         return instance;
     }
 
+    /**
+     * Plugin shutdown logic.
+     * Saves the configuration to file.
+     */
     @Override
     public void onDisable() {
         // Plugin shutdown logic
@@ -56,6 +79,8 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("setwarp", new SetWarpCommand());
         registerCommand("warp", new WarpCommand(), new WarpTabCompleter());
         registerCommand("delwarp", new DelWarpCommand(), new WarpTabCompleter());
+        registerCommand("enderchest", new WorkbenchCommand());
+        registerCommand("workbench", new WorkbenchCommand());
 
     }
 

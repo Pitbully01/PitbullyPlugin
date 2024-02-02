@@ -28,7 +28,7 @@ public class WarpCommand implements CommandExecutor {
         String warp = args[0];
         if (Locations.checkWarpLocation(warp)) {
             player.teleport(Locations.getWarpLocation(warp));
-            player.sendMessage("Woosch, du wurdest zu " + warp + "teleportiert :)");
+            player.sendMessage("Woosch, du wurdest zu " + warp + " teleportiert :)");
         } else {
             player.sendMessage("§cDieser Warp existiert nicht");
         }
