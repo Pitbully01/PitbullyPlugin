@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 public class SafeTeleport {
 
-//TODO fix this method
+
     /**
      * Teleports a player to a location.
      * This method will attempt to teleport the player to the specified location.
