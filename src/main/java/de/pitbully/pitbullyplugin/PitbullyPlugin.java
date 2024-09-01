@@ -1,9 +1,11 @@
 package de.pitbully.pitbullyplugin;
 /*TODO:/wb workbench, /tpa
-*/
+ */
+
 import de.pitbully.pitbullyplugin.commands.*;
 import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
 import de.pitbully.pitbullyplugin.listeners.LocationListener;
+import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
 import de.pitbully.pitbullyplugin.utils.Locations;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
@@ -14,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+
 /**
  * Main class for the PitbullyPlugin Bukkit plugin.
  * This class extends JavaPlugin and serves as the entry point for the plugin.
@@ -33,12 +36,14 @@ public final class PitbullyPlugin extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         registerCommands();
+        registerEvents();
         instance = this;
-        getServer().getPluginManager().registerEvents(new LocationListener(), this);
+
 
         initConfig();
         loadConfig();
     }
+
 
     /**
      * Initializes the plugin configuration if it is not already initialized.
@@ -82,6 +87,11 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("enderchest", new EnderchestCommand());
         registerCommand("workbench", new WorkbenchCommand());
 
+    }
+
+    private void registerEvents() {
+        getServer().getPluginManager().registerEvents(new LocationListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
     }
 
     private void registerCommand(String command, CommandExecutor commandExecutor) {

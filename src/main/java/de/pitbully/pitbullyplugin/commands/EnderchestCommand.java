@@ -13,11 +13,23 @@ public class EnderchestCommand implements CommandExecutor {
         if (!(commandSender instanceof Player)) {
             return true;
         }
+            if(strings.length == 1){
+                Player target = commandSender.getServer().getPlayer(strings[0]);
+                if(target == null){
+                    commandSender.sendMessage("Player not found");
+                    return true;
+                }
+                execute((Player) commandSender, target);
+                return false;
+            }
             Player player = (Player) commandSender;
             execute(player);
             return false;
     }
     private void execute(Player player){
         player.openInventory(player.getEnderChest());
+    }
+    private void execute(Player player, Player target){
+        player.openInventory(target.getEnderChest());
     }
 }

@@ -18,3 +18,7 @@ commands:
     aliases: [ec]
   workbench:
     aliases: [wb]
+permissions:
+  pitbullyplugin.keepxp:
+    description: Allows the player to keep their experience upon death.
+    default: false

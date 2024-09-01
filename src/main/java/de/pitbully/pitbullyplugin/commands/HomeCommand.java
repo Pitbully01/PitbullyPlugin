@@ -27,7 +27,6 @@ public class HomeCommand implements CommandExecutor {
                 } else {
                     player.sendMessage("§cEs gab ein Problem beim teleportieren");
                 }
-                player.teleport(Objects.requireNonNull(Locations.getHomeLocation(player.getUniqueId())));
             } else {
                 player.sendMessage("§cKein Home gesetzt");
             }

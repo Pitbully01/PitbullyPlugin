@@ -6,7 +6,7 @@
 
     <groupId>de.pitbully</groupId>
     <artifactId>PitbullyPlugin</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
 
     <name>PitbullyPlugin</name>
@@ -68,6 +68,11 @@
             <artifactId>paper-api</artifactId>
             <version>1.20-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
         </dependency>
     </dependencies>
 </project>
