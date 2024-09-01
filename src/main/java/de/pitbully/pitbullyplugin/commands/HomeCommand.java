@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import de.pitbully.pitbullyplugin.utils.Locations;
 import de.pitbully.pitbullyplugin.utils.SafeTeleport;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,8 +18,6 @@ public class HomeCommand implements CommandExecutor {
             return true;
         } else {
             Player player = (Player) commandSender;
-            UUID uuid = player.getUniqueId();
-
             if (Locations.checkHomeLocation(player.getUniqueId())) {
                 if (SafeTeleport.teleport(player, Objects.requireNonNull(Locations.getHomeLocation(player.getUniqueId())))) {
                     player.sendMessage("Du wurdest zurück nach ♥Hause♥ teleportiert! :)");
