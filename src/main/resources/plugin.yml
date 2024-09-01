@@ -7,18 +7,54 @@ authors: [Pitbully01]
 description: a
 website: https://safekane.de
 commands:
-  back: {}
-  home: {}
-  sethome: {}
-  delhome: {}
-  setwarp: {}
-  delwarp: {}
-  warp: {}
+  back:
+    description: Teleports you back to your last location.
+  home:
+    description: Teleports you to your home.
+  sethome:
+    description: Sets your home location.
+  delhome:
+    description: Deletes your home location.
+  setwarp:
+    description: Sets a warp point.
+  delwarp:
+    description: Deletes a warp point.
+  warp:
+    description: Warps you to a warp point.
   enderchest:
+    description: Opens your ender chest.
     aliases: [ec]
   workbench:
+    description: Opens a workbench.
     aliases: [wb]
 permissions:
   pitbullyplugin.keepxp:
     description: Allows the player to keep their experience upon death.
-    default: false
+    default: op
+  pitbullyplugin.back:
+    description: Allows the player to use the back command.
+    default: true
+  pitbullyplugin.home:
+    description: Allows the player to use the home command.
+    default: true
+  pitbullyplugin.sethome:
+    description: Allows the player to use the sethome command.
+    default: true
+  pitbullyplugin.delhome:
+    description: Allows the player to use the delhome command.
+    default: true
+  pitbullyplugin.setwarp:
+    description: Allows the player to use the setwarp command.
+    default: op
+  pitbullyplugin.delwarp:
+    description: Allows the player to use the delwarp command.
+    default: true
+  pitbullyplugin.warp:
+    description: Allows the player to use the warp command.
+    default: true
+  pitbullyplugin.enderchest:
+    description: Allows the player to use the enderchest command.
+    default: true
+  pitbullyplugin.workbench:
+    description: Allows the player to use the workbench command.
+    default: true
