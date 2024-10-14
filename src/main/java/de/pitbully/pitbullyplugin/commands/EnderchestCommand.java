@@ -16,7 +16,7 @@ public class EnderchestCommand implements CommandExecutor {
             if(strings.length == 1){
                 Player target = commandSender.getServer().getPlayer(strings[0]);
                 if(target == null){
-                    commandSender.sendMessage("Player not found");
+                    commandSender.sendMessage("§cSpieler nicht gefunden!");
                     return true;
                 }
                 execute((Player) commandSender, target);

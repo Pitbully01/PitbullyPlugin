@@ -2,10 +2,10 @@ package de.pitbully.pitbullyplugin.commands;
 
 
 import java.util.Objects;
-import java.util.UUID;
 
 import de.pitbully.pitbullyplugin.utils.Locations;
 import de.pitbully.pitbullyplugin.utils.SafeTeleport;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

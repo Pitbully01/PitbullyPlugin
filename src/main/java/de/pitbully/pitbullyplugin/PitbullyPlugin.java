@@ -6,7 +6,9 @@ import de.pitbully.pitbullyplugin.commands.*;
 import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
 import de.pitbully.pitbullyplugin.listeners.LocationListener;
 import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
+import de.pitbully.pitbullyplugin.utils.CooldownManager;
 import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.utils.TeleportRequestManager;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,6 +29,17 @@ public final class PitbullyPlugin extends JavaPlugin {
     private static PitbullyPlugin instance;
     private File configFile;
     private FileConfiguration config;
+
+    public Config config;
+    public CooldownManager cooldownManager;
+    public TeleportRequestManager teleportRequestManager;
+
+    public PitbullyPlugin() {
+        config = new Config(this);
+        cooldownManager = new CooldownManager();
+        teleportRequestManager = new TeleportRequestManager(this);
+    }
+
 
     /**
      * Plugin startup logic.
