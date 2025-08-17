@@ -9,28 +9,48 @@ website: https://nalumina.de
 commands:
   home:
     permission: pit.home
-    permission-default: true
   sethome:
     permission: pit.sethome
-    permission-default: true
   delhome:
     permission: pit.delhome
-    permission-default: true
   back:
     permission: pit.back
-    permission-default: true
   setwarp:
     permission: pit.setwarp
-    permission-default: true
   warp:
     permission: pit.warp
-    permission-default: true
   delwarp:
     permission: pit.delwarp
-    permission-default: true
   enderchest:
     permission: pit.enderchest
-    permission-default: true
   workbench:
     permission: pit.workbench
-    permission-default: true
+
+permissions:
+  pit.home:
+    description: Allows the player to teleport to their home
+    default: true
+  pit.sethome:
+    description: Allows the player to set their home location
+    default: true
+  pit.delhome:
+    description: Allows the player to delete their home location
+    default: true
+  pit.back:
+    description: Allows the player to teleport back to their previous location
+    default: true
+  pit.setwarp:
+    description: Allows the player to set warp points
+    default: true
+  pit.warp:
+    description: Allows the player to use warp points
+    default: true
+  pit.delwarp:
+    description: Allows the player to delete warp points
+    default: true
+  pit.enderchest:
+    description: Allows the player to access their enderchest
+    default: true
+  pit.workbench:
+    description: Allows the player to open a workbench
+    default: true
