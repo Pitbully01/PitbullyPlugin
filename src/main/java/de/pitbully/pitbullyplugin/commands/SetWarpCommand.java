@@ -1,50 +1,44 @@
-/*    */ package de.pitbully.pitbullyplugin.commands;
-/*    */ 
-/*    */ import de.pitbully.pitbullyplugin.PitbullyPlugin;
-/*    */ import de.pitbully.pitbullyplugin.utils.Locations;
-/*    */ import java.util.UUID;
-/*    */ import org.bukkit.command.Command;
-/*    */ import org.bukkit.command.CommandExecutor;
-/*    */ import org.bukkit.command.CommandSender;
-/*    */ import org.bukkit.entity.Player;
-/*    */ import org.bukkit.plugin.java.JavaPlugin;
-/*    */ import org.jetbrains.annotations.NotNull;
-/*    */ 
-/*    */ public class SetWarpCommand
-/*    */   implements CommandExecutor {
-/*    */   private JavaPlugin plugin;
-/*    */   
-/*    */   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-/* 18 */     if (!(commandSender instanceof Player)) {
-/* 19 */       return true;
-/*    */     }
-/* 21 */     Player player = (Player)commandSender;
-/* 22 */     UUID uuid = player.getUniqueId();
-/* 23 */     execute(player, args);
-/* 24 */     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
-/* 25 */     this.plugin.saveConfig();
-/*    */     
-/* 27 */     return false;
-/*    */   }
-/*    */ 
-/*    */   
-/*    */   private void execute(Player player, String[] args) {
-/* 32 */     if (args.length != 1) {
-/* 33 */       player.sendMessage("zu wenig oder zu viele argumente" + args.length);
-/*    */       return;
-/*    */     } 
-/* 36 */     String warp = args[0];
-/* 37 */     if (Locations.checkWarpLocation(warp)) {
-/* 38 */       player.sendMessage("Der Warp " + warp + " existiert bereits, bitte lösche ihn um ihn neu zu setzen");
-/*    */       return;
-/*    */     } 
-/* 41 */     player.sendMessage("Der Warp " + warp + " wurde gesetzt! :)");
-/* 42 */     Locations.updateWarpLocation(warp, player.getLocation());
-/*    */   }
-/*    */ }
+package de.pitbully.pitbullyplugin.commands;
 
+import de.pitbully.pitbullyplugin.PitbullyPlugin;
+import de.pitbully.pitbullyplugin.utils.Locations;
+import java.util.UUID;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\commands\SetWarpCommand.class
- * Java compiler version: 14 (58.0)
- * JD-Core Version:       1.1.3
- */
+public class SetWarpCommand
+  implements CommandExecutor {
+  private JavaPlugin plugin;
+  
+  public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+    if (!(commandSender instanceof Player)) {
+      return true;
+    }
+    Player player = (Player)commandSender;
+    UUID uuid = player.getUniqueId();
+    execute(player, args);
+    this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
+    this.plugin.saveConfig();
+    
+    return false;
+  }
+
+  
+  private void execute(Player player, String[] args) {
+    if (args.length != 1) {
+      player.sendMessage("zu wenig oder zu viele argumente" + args.length);
+      return;
+    } 
+    String warp = args[0];
+    if (Locations.checkWarpLocation(warp)) {
+      player.sendMessage("Der Warp " + warp + " existiert bereits, bitte lösche ihn um ihn neu zu setzen");
+      return;
+    } 
+    player.sendMessage("Der Warp " + warp + " wurde gesetzt! :)");
+    Locations.updateWarpLocation(warp, player.getLocation());
+  }
+}

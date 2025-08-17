@@ -1,35 +1,29 @@
-/*    */ package de.pitbully.pitbullyplugin.commands;
-/*    */ 
-/*    */ import de.pitbully.pitbullyplugin.PitbullyPlugin;
-/*    */ import de.pitbully.pitbullyplugin.utils.Locations;
-/*    */ import org.bukkit.command.Command;
-/*    */ import org.bukkit.command.CommandExecutor;
-/*    */ import org.bukkit.command.CommandSender;
-/*    */ import org.bukkit.entity.Player;
-/*    */ import org.bukkit.plugin.java.JavaPlugin;
-/*    */ import org.jetbrains.annotations.NotNull;
-/*    */ 
-/*    */ public class SetHomeCommand implements CommandExecutor {
-/*    */   private JavaPlugin plugin;
-/*    */   
-/*    */   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
-/* 16 */     if (!(commandSender instanceof Player)) {
-/* 17 */       return true;
-/*    */     }
-/* 19 */     Player player = (Player)commandSender;
-/*    */ 
-/*    */     
-/* 22 */     Locations.updateHomeLocation(player.getUniqueId(), player.getLocation());
-/* 23 */     player.sendMessage("Home gesetzt! :)");
-/* 24 */     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
-/* 25 */     this.plugin.saveConfig();
-/*    */     
-/* 27 */     return false;
-/*    */   }
-/*    */ }
+package de.pitbully.pitbullyplugin.commands;
 
+import de.pitbully.pitbullyplugin.PitbullyPlugin;
+import de.pitbully.pitbullyplugin.utils.Locations;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\commands\SetHomeCommand.class
- * Java compiler version: 14 (58.0)
- * JD-Core Version:       1.1.3
- */
+public class SetHomeCommand implements CommandExecutor {
+  private JavaPlugin plugin;
+  
+  public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    if (!(commandSender instanceof Player)) {
+      return true;
+    }
+    Player player = (Player)commandSender;
+
+    
+    Locations.updateHomeLocation(player.getUniqueId(), player.getLocation());
+    player.sendMessage("Home gesetzt! :)");
+    this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
+    this.plugin.saveConfig();
+    
+    return false;
+  }
+}

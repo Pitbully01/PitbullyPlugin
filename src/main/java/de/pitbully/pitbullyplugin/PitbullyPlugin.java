@@ -1,142 +1,157 @@
-/*     */ package de.pitbully.pitbullyplugin;
-/*     */ 
-/*     */ import de.pitbully.pitbullyplugin.commands.BackCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.DelHomeCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.DelWarpCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.EnderchestCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.HomeCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.SetHomeCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.SetWarpCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
-/*     */ import de.pitbully.pitbullyplugin.commands.WarpCommand;
-/*     */ import de.pitbully.pitbullyplugin.commands.WorkbenchCommand;
-/*     */ import de.pitbully.pitbullyplugin.listeners.LocationListener;
-/*     */ import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
-/*     */ import de.pitbully.pitbullyplugin.utils.Locations;
-/*     */ import java.io.File;
-/*     */ import java.io.IOException;
-/*     */ import java.util.Objects;
-/*     */ import org.bukkit.command.CommandExecutor;
-/*     */ import org.bukkit.command.PluginCommand;
-/*     */ import org.bukkit.command.TabCompleter;
-/*     */ import org.bukkit.configuration.file.FileConfiguration;
-/*     */ import org.bukkit.configuration.file.YamlConfiguration;
-/*     */ import org.bukkit.event.Listener;
-/*     */ import org.bukkit.plugin.Plugin;
-/*     */ import org.bukkit.plugin.java.JavaPlugin;
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ public final class PitbullyPlugin
-/*     */   extends JavaPlugin
-/*     */ {
-/*     */   private static PitbullyPlugin instance;
-/*     */   private File configFile;
-/*     */   private FileConfiguration config;
-/*     */   
-/*     */   public void onEnable() {
-/*  38 */     registerCommands();
-/*  39 */     registerEvents();
-/*  40 */     instance = this;
-/*     */ 
-/*     */     
-/*  43 */     initConfig();
-/*  44 */     loadConfig();
-/*     */   }
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */   
-/*     */   private void initConfig() {
-/*  53 */     if (this.config == null) {
-/*  54 */       this.configFile = new File(getDataFolder(), "config.yml");
-/*  55 */       this.config = (FileConfiguration)YamlConfiguration.loadConfiguration(this.configFile);
-/*     */     } 
-/*     */   }
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */   
-/*     */   public static PitbullyPlugin getInstance() {
-/*  66 */     return instance;
-/*     */   }
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */   
-/*     */   public void onDisable() {
-/*  76 */     saveConfig();
-/*     */   }
-/*     */   
-/*     */   private void registerCommands() {
-/*  80 */     registerCommand("home", (CommandExecutor)new HomeCommand());
-/*  81 */     registerCommand("sethome", (CommandExecutor)new SetHomeCommand());
-/*  82 */     registerCommand("delhome", (CommandExecutor)new DelHomeCommand());
-/*  83 */     registerCommand("back", (CommandExecutor)new BackCommand());
-/*  84 */     registerCommand("setwarp", (CommandExecutor)new SetWarpCommand());
-/*  85 */     registerCommand("warp", (CommandExecutor)new WarpCommand(), (TabCompleter)new WarpTabCompleter());
-/*  86 */     registerCommand("delwarp", (CommandExecutor)new DelWarpCommand(), (TabCompleter)new WarpTabCompleter());
-/*  87 */     registerCommand("enderchest", (CommandExecutor)new EnderchestCommand());
-/*  88 */     registerCommand("workbench", (CommandExecutor)new WorkbenchCommand());
-/*     */   }
-/*     */ 
-/*     */   
-/*     */   private void registerEvents() {
-/*  93 */     getServer().getPluginManager().registerEvents((Listener)new LocationListener(), (Plugin)this);
-/*  94 */     getServer().getPluginManager().registerEvents((Listener)new PlayerDeathListener(), (Plugin)this);
-/*     */   }
-/*     */   
-/*     */   private void registerCommand(String command, CommandExecutor commandExecutor) {
-/*  98 */     ((PluginCommand)Objects.<PluginCommand>requireNonNull(getCommand(command))).setExecutor(commandExecutor);
-/*     */   }
-/*     */   
-/*     */   private void registerCommand(String command, CommandExecutor commandExecutor, TabCompleter tabCompleter) {
-/* 102 */     ((PluginCommand)Objects.<PluginCommand>requireNonNull(getCommand(command))).setTabCompleter(tabCompleter);
-/* 103 */     registerCommand(command, commandExecutor);
-/*     */   }
-/*     */   
-/*     */   private void loadConfig() {
-/* 107 */     if (this.config == null) {
-/* 108 */       getLogger().warning("Config not initialized. Skipping load.");
-/*     */       
-/*     */       return;
-/*     */     } 
-/* 112 */     if (!this.configFile.exists() || this.configFile.length() == 0L) {
-/* 113 */       getLogger().warning("Config.yml not found or empty. Using default values.");
-/*     */       
-/*     */       return;
-/*     */     } 
-/*     */     
-/* 118 */     Locations.loadFromConfig(this.config);
-/*     */   }
-/*     */   
-/*     */   public void saveConfig() {
-/* 122 */     if (this.config == null) {
-/* 123 */       getLogger().warning("Config not initialized. Skipping save.");
-/*     */       
-/*     */       return;
-/*     */     } 
-/*     */     
-/* 128 */     Locations.saveToConfig(this.config);
-/*     */     
-/*     */     try {
-/* 131 */       this.config.save(this.configFile);
-/* 132 */     } catch (IOException e) {
-/* 133 */       e.printStackTrace();
-/*     */     } 
-/*     */   }
-/*     */ }
+package de.pitbully.pitbullyplugin;
 
+import de.pitbully.pitbullyplugin.commands.BackCommand;
+import de.pitbully.pitbullyplugin.commands.DelHomeCommand;
+import de.pitbully.pitbullyplugin.commands.DelWarpCommand;
+import de.pitbully.pitbullyplugin.commands.EnderchestCommand;
+import de.pitbully.pitbullyplugin.commands.HomeCommand;
+import de.pitbully.pitbullyplugin.commands.SetHomeCommand;
+import de.pitbully.pitbullyplugin.commands.SetWarpCommand;
+import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
+import de.pitbully.pitbullyplugin.commands.WarpCommand;
+import de.pitbully.pitbullyplugin.commands.WorkbenchCommand;
+import de.pitbully.pitbullyplugin.listeners.LocationListener;
+import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
+import de.pitbully.pitbullyplugin.utils.Locations;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\PitbullyPlugin.class
- * Java compiler version: 14 (58.0)
- * JD-Core Version:       1.1.3
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+/**
+ * Main plugin class for PitbullyPlugin.
+ * Handles plugin initialization, command registration, and configuration management.
  */
+public final class PitbullyPlugin extends JavaPlugin {
+    
+    private static PitbullyPlugin instance;
+    private File configFile;
+    private FileConfiguration config;
+    
+    @Override
+    public void onEnable() {
+        instance = this;
+        
+        initConfig();
+        registerCommands();
+        registerEvents();
+        loadConfig();
+        
+        getLogger().info("PitbullyPlugin has been enabled!");
+    }
+    
+    @Override
+    public void onDisable() {
+        saveConfig();
+        getLogger().info("PitbullyPlugin has been disabled!");
+    }
+    
+    /**
+     * Get the plugin instance.
+     * 
+     * @return The plugin instance
+     */
+    public static PitbullyPlugin getInstance() {
+        return instance;
+    }
+    
+    /**
+     * Initialize the configuration file.
+     */
+    private void initConfig() {
+        if (this.config == null) {
+            this.configFile = new File(getDataFolder(), "config.yml");
+            this.config = YamlConfiguration.loadConfiguration(this.configFile);
+        }
+    }
+    
+    /**
+     * Register all plugin commands.
+     */
+    private void registerCommands() {
+        WarpTabCompleter warpTabCompleter = new WarpTabCompleter();
+        
+        registerCommand("home", new HomeCommand());
+        registerCommand("sethome", new SetHomeCommand());
+        registerCommand("delhome", new DelHomeCommand());
+        registerCommand("back", new BackCommand());
+        registerCommand("setwarp", new SetWarpCommand());
+        registerCommand("warp", new WarpCommand(), warpTabCompleter);
+        registerCommand("delwarp", new DelWarpCommand(), warpTabCompleter);
+        registerCommand("enderchest", new EnderchestCommand());
+        registerCommand("workbench", new WorkbenchCommand());
+    }
+    
+    /**
+     * Register all event listeners.
+     */
+    private void registerEvents() {
+        getServer().getPluginManager().registerEvents(new LocationListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
+    }
+    
+    /**
+     * Register a command with its executor.
+     * 
+     * @param command The command name
+     * @param commandExecutor The command executor
+     */
+    private void registerCommand(String command, CommandExecutor commandExecutor) {
+        Objects.requireNonNull(getCommand(command)).setExecutor(commandExecutor);
+    }
+    
+    /**
+     * Register a command with its executor and tab completer.
+     * 
+     * @param command The command name
+     * @param commandExecutor The command executor
+     * @param tabCompleter The tab completer
+     */
+    private void registerCommand(String command, CommandExecutor commandExecutor, TabCompleter tabCompleter) {
+        Objects.requireNonNull(getCommand(command)).setExecutor(commandExecutor);
+        Objects.requireNonNull(getCommand(command)).setTabCompleter(tabCompleter);
+    }
+   
+    /**
+     * Load configuration from file.
+     */
+    private void loadConfig() {
+        if (this.config == null) {
+            getLogger().warning("Config not initialized. Skipping load.");
+            return;
+        }
+        
+        if (!this.configFile.exists() || this.configFile.length() == 0L) {
+            getLogger().warning("Config.yml not found or empty. Using default values.");
+            return;
+        }
+        
+        Locations.loadFromConfig(this.config);
+        getLogger().info("Configuration loaded successfully.");
+    }
+    
+    /**
+     * Save configuration to file.
+     */
+    public void saveConfig() {
+        if (this.config == null) {
+            getLogger().warning("Config not initialized. Skipping save.");
+            return;
+        }
+        
+        Locations.saveToConfig(this.config);
+        
+        try {
+            this.config.save(this.configFile);
+            getLogger().info("Configuration saved successfully.");
+        } catch (IOException e) {
+            getLogger().severe("Could not save config to " + this.configFile);
+            e.printStackTrace();
+        }
+    }
+}

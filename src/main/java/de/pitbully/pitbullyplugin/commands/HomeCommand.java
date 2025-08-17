@@ -1,39 +1,53 @@
-/*    */ package de.pitbully.pitbullyplugin.commands;
-/*    */ 
-/*    */ import de.pitbully.pitbullyplugin.utils.Locations;
-/*    */ import de.pitbully.pitbullyplugin.utils.SafeTeleport;
-/*    */ import java.util.Objects;
-/*    */ import org.bukkit.Location;
-/*    */ import org.bukkit.command.Command;
-/*    */ import org.bukkit.command.CommandExecutor;
-/*    */ import org.bukkit.command.CommandSender;
-/*    */ import org.bukkit.entity.Player;
-/*    */ import org.jetbrains.annotations.NotNull;
-/*    */ 
-/*    */ public class HomeCommand
-/*    */   implements CommandExecutor
-/*    */ {
-/*    */   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-/* 17 */     if (!(commandSender instanceof Player)) {
-/* 18 */       return true;
-/*    */     }
-/* 20 */     Player player = (Player)commandSender;
-/* 21 */     if (Locations.checkHomeLocation(player.getUniqueId())) {
-/* 22 */       if (SafeTeleport.teleport(player, Objects.<Location>requireNonNull(Locations.getHomeLocation(player.getUniqueId())))) {
-/* 23 */         player.sendMessage("Du wurdest zurück nach ♥Hause♥ teleportiert! :)");
-/*    */       } else {
-/* 25 */         player.sendMessage("§cEs gab ein Problem beim teleportieren");
-/*    */       } 
-/*    */     } else {
-/* 28 */       player.sendMessage("§cKein Home gesetzt");
-/*    */     } 
-/*    */     
-/* 31 */     return false;
-/*    */   }
-/*    */ }
+package de.pitbully.pitbullyplugin.commands;
 
+import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.utils.SafeTeleport;
+import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\commands\HomeCommand.class
- * Java compiler version: 14 (58.0)
- * JD-Core Version:       1.1.3
+/**
+ * Command executor for the /home command.
+ * Teleports players to their set home location.
  */
+public class HomeCommand implements CommandExecutor {
+    
+    private static final String HOME_SUCCESS_MESSAGE = "Du wurdest zurück nach ♥Hause♥ teleportiert! :)";
+    private static final String TELEPORT_ERROR_MESSAGE = "§cEs gab ein Problem beim teleportieren";
+    private static final String NO_HOME_MESSAGE = "§cKein Home gesetzt";
+    
+    @Override
+    public boolean onCommand(@NotNull CommandSender commandSender, 
+                           @NotNull Command command, 
+                           @NotNull String label, 
+                           @NotNull String[] args) {
+        
+        if (!(commandSender instanceof Player)) {
+            return true;
+        }
+        
+        Player player = (Player) commandSender;
+        
+        if (!Locations.checkHomeLocation(player.getUniqueId())) {
+            player.sendMessage(NO_HOME_MESSAGE);
+            return true;
+        }
+        
+        Location homeLocation = Locations.getHomeLocation(player.getUniqueId());
+        if (homeLocation == null) {
+            player.sendMessage(NO_HOME_MESSAGE);
+            return true;
+        }
+        
+        if (SafeTeleport.teleport(player, homeLocation)) {
+            player.sendMessage(HOME_SUCCESS_MESSAGE);
+        } else {
+            player.sendMessage(TELEPORT_ERROR_MESSAGE);
+        }
+        
+        return true;
+    }
+}

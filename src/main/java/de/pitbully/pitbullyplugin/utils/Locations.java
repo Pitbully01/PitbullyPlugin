@@ -1,173 +1,161 @@
-/*     */ package de.pitbully.pitbullyplugin.utils;
-/*     */ 
-/*     */ import java.util.HashMap;
-/*     */ import java.util.Objects;
-/*     */ import java.util.UUID;
-/*     */ import org.bukkit.Location;
-/*     */ import org.bukkit.configuration.ConfigurationSection;
-/*     */ import org.bukkit.configuration.file.FileConfiguration;
-/*     */ 
-/*     */ 
-/*     */ 
-/*     */ public class Locations
-/*     */ {
-/*  14 */   private static HashMap<UUID, Location> lastDeathLocations = new HashMap<>();
-/*  15 */   private static HashMap<UUID, Location> lastTeleportLocations = new HashMap<>();
-/*  16 */   private static HashMap<UUID, Location> lastLocations = new HashMap<>();
-/*  17 */   private static HashMap<UUID, Location> homeLocations = new HashMap<>();
-/*  18 */   private static HashMap<String, Location> warpLocations = new HashMap<>();
-/*     */ 
-/*     */   
-/*     */   public static void updateLastDeathLocations(UUID playerId, Location location) {
-/*  22 */     lastDeathLocations.put(playerId, location);
-/*  23 */     updateLastLocations(playerId, location);
-/*     */   }
-/*     */   
-/*     */   public static Location getLastDeathLocation(UUID playerId) {
-/*  27 */     return lastDeathLocations.get(playerId);
-/*     */   }
-/*     */   
-/*     */   public static void updateLastTeleportLocations(UUID playerId, Location location) {
-/*  31 */     lastTeleportLocations.put(playerId, location);
-/*  32 */     updateLastLocations(playerId, location);
-/*     */   }
-/*     */   
-/*     */   public static Location getLastTeleportLocations(UUID playerId) {
-/*  36 */     return lastTeleportLocations.get(playerId);
-/*     */   }
-/*     */   
-/*     */   public static void updateLastLocations(UUID playerId, Location location) {
-/*  40 */     lastLocations.put(playerId, location);
-/*     */   }
-/*     */   
-/*     */   public static Location getLastLocation(UUID playerId) {
-/*  44 */     return lastLocations.get(playerId);
-/*     */   }
-/*     */   
-/*     */   public static boolean checkLastLocation(UUID playerId) {
-/*  48 */     return lastLocations.containsKey(playerId);
-/*     */   }
-/*     */   
-/*     */   public static void updateHomeLocation(UUID playerId, Location location) {
-/*  52 */     homeLocations.put(playerId, location);
-/*     */   }
-/*     */   
-/*     */   public static Location getHomeLocation(UUID playerId) {
-/*  56 */     return homeLocations.get(playerId);
-/*     */   }
-/*     */   
-/*     */   public static boolean checkHomeLocation(UUID playerId) {
-/*  60 */     return homeLocations.containsKey(playerId);
-/*     */   }
-/*     */   
-/*     */   public static void deleteHomeLocation(UUID playerId) {
-/*  64 */     homeLocations.remove(playerId);
-/*     */   }
-/*     */ 
-/*     */   
-/*     */   public static void updateWarpLocation(String warp, Location location) {
-/*  69 */     warpLocations.put(warp, location);
-/*     */   }
-/*     */   
-/*     */   public static Location getWarpLocation(String warp) {
-/*  73 */     return warpLocations.get(warp);
-/*     */   }
-/*     */   
-/*     */   public static HashMap<String, Location> getWarpHashMap() {
-/*  77 */     return warpLocations;
-/*     */   }
-/*     */   
-/*     */   public static boolean checkWarpLocation(String warp) {
-/*  81 */     return warpLocations.containsKey(warp);
-/*     */   }
-/*     */ 
-/*     */   
-/*     */   public static void deleteWarpLocation(String warp) {
-/*  86 */     warpLocations.remove(warp);
-/*     */   }
-/*     */ 
-/*     */ 
-/*     */   
-/*     */   public static void loadFromConfig(FileConfiguration config) {
-/*  92 */     ConfigurationSection lastDeathSection = config.getConfigurationSection("lastDeathLocations");
-/*  93 */     if (lastDeathSection != null) {
-/*  94 */       for (String key : ((ConfigurationSection)Objects.<ConfigurationSection>requireNonNull(config.getConfigurationSection("lastDeathLocations"))).getKeys(false)) {
-/*  95 */         UUID playerId = UUID.fromString(key);
-/*  96 */         Location location = (Location)config.get("lastDeathLocations." + key);
-/*  97 */         lastDeathLocations.put(playerId, location);
-/*     */       } 
-/*     */     }
-/*     */ 
-/*     */     
-/* 102 */     ConfigurationSection lastTeleportSection = config.getConfigurationSection("lastTeleportLocations");
-/* 103 */     if (lastTeleportSection != null) {
-/* 104 */       for (String key : ((ConfigurationSection)Objects.<ConfigurationSection>requireNonNull(config.getConfigurationSection("lastTeleportLocations"))).getKeys(false)) {
-/* 105 */         UUID playerId = UUID.fromString(key);
-/* 106 */         Location location = (Location)config.get("lastTeleportLocations." + key);
-/* 107 */         lastTeleportLocations.put(playerId, location);
-/*     */       } 
-/*     */     }
-/*     */ 
-/*     */     
-/* 112 */     ConfigurationSection lastSection = config.getConfigurationSection("lastLocations");
-/* 113 */     if (lastSection != null) {
-/* 114 */       for (String key : ((ConfigurationSection)Objects.<ConfigurationSection>requireNonNull(config.getConfigurationSection("lastLocations"))).getKeys(false)) {
-/* 115 */         UUID playerId = UUID.fromString(key);
-/* 116 */         Location location = (Location)config.get("lastLocations." + key);
-/* 117 */         lastLocations.put(playerId, location);
-/*     */       } 
-/*     */     }
-/*     */ 
-/*     */     
-/* 122 */     ConfigurationSection homeSection = config.getConfigurationSection("homeLocations");
-/* 123 */     if (homeSection != null) {
-/* 124 */       for (String key : ((ConfigurationSection)Objects.<ConfigurationSection>requireNonNull(config.getConfigurationSection("homeLocations"))).getKeys(false)) {
-/* 125 */         UUID playerId = UUID.fromString(key);
-/* 126 */         Location location = (Location)config.get("homeLocations." + key);
-/* 127 */         homeLocations.put(playerId, location);
-/*     */       } 
-/*     */     }
-/*     */ 
-/*     */     
-/* 132 */     ConfigurationSection warpSection = config.getConfigurationSection("warpLocations");
-/* 133 */     if (warpSection != null) {
-/* 134 */       for (String key : ((ConfigurationSection)Objects.<ConfigurationSection>requireNonNull(config.getConfigurationSection("warpLocations"))).getKeys(false)) {
-/* 135 */         Location location = (Location)config.get("warpLocations." + key);
-/* 136 */         warpLocations.put(key, location);
-/*     */       } 
-/*     */     }
-/*     */   }
-/*     */ 
-/*     */ 
-/*     */   
-/*     */   public static void saveToConfig(FileConfiguration config) {
-/* 144 */     for (UUID playerId : lastDeathLocations.keySet()) {
-/* 145 */       config.set("lastDeathLocations." + playerId, lastDeathLocations.get(playerId));
-/*     */     }
-/*     */ 
-/*     */     
-/* 149 */     for (UUID playerId : lastTeleportLocations.keySet()) {
-/* 150 */       config.set("lastTeleportLocations." + playerId, lastTeleportLocations.get(playerId));
-/*     */     }
-/*     */ 
-/*     */     
-/* 154 */     for (UUID playerId : lastLocations.keySet()) {
-/* 155 */       config.set("lastLocations." + playerId, lastLocations.get(playerId));
-/*     */     }
-/*     */ 
-/*     */     
-/* 159 */     for (UUID playerId : homeLocations.keySet()) {
-/* 160 */       config.set("homeLocations." + playerId, homeLocations.get(playerId));
-/*     */     }
-/*     */ 
-/*     */     
-/* 164 */     for (String warpName : warpLocations.keySet())
-/* 165 */       config.set("warpLocations." + warpName, warpLocations.get(warpName)); 
-/*     */   }
-/*     */ }
+package de.pitbully.pitbullyplugin.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugi\\utils\Locations.class
- * Java compiler version: 14 (58.0)
- * JD-Core Version:       1.1.3
+/**
+ * Utility class for managing player locations including homes, warps, 
+ * death locations, and teleport history.
  */
+public class Locations {
+    
+    private static final Map<UUID, Location> lastDeathLocations = new HashMap<>();
+    private static final Map<UUID, Location> lastTeleportLocations = new HashMap<>();
+    private static final Map<UUID, Location> lastLocations = new HashMap<>();
+    private static final Map<UUID, Location> homeLocations = new HashMap<>();
+    private static final Map<String, Location> warpLocations = new HashMap<>();
+
+    // Death Location Methods
+    public static void updateLastDeathLocations(UUID playerId, Location location) {
+        lastDeathLocations.put(playerId, location);
+        updateLastLocations(playerId, location);
+    }
+
+    public static Location getLastDeathLocation(UUID playerId) {
+        return lastDeathLocations.get(playerId);
+    }
+
+    // Teleport Location Methods
+    public static void updateLastTeleportLocations(UUID playerId, Location location) {
+        lastTeleportLocations.put(playerId, location);
+        updateLastLocations(playerId, location);
+    }
+
+    public static Location getLastTeleportLocations(UUID playerId) {
+        return lastTeleportLocations.get(playerId);
+    }
+
+    // Last Location Methods
+    public static void updateLastLocations(UUID playerId, Location location) {
+        lastLocations.put(playerId, location);
+    }
+
+    public static Location getLastLocation(UUID playerId) {
+        return lastLocations.get(playerId);
+    }
+
+    public static boolean checkLastLocation(UUID playerId) {
+        return lastLocations.containsKey(playerId);
+    }
+
+    // Home Location Methods
+    public static void updateHomeLocation(UUID playerId, Location location) {
+        homeLocations.put(playerId, location);
+    }
+
+    public static Location getHomeLocation(UUID playerId) {
+        return homeLocations.get(playerId);
+    }
+
+    public static boolean checkHomeLocation(UUID playerId) {
+        return homeLocations.containsKey(playerId);
+    }
+
+    public static void deleteHomeLocation(UUID playerId) {
+        homeLocations.remove(playerId);
+    }
+
+    // Warp Location Methods
+    public static void updateWarpLocation(String warp, Location location) {
+        warpLocations.put(warp, location);
+    }
+
+    public static Location getWarpLocation(String warp) {
+        return warpLocations.get(warp);
+    }
+
+    public static Map<String, Location> getWarpHashMap() {
+        return new HashMap<>(warpLocations);
+    }
+
+    public static boolean checkWarpLocation(String warp) {
+        return warpLocations.containsKey(warp);
+    }
+
+    public static void deleteWarpLocation(String warp) {
+        warpLocations.remove(warp);
+    }
+
+    /**
+     * Loads location data from the configuration file.
+     * 
+     * @param config The configuration to load from
+     */
+    public static void loadFromConfig(FileConfiguration config) {
+        loadLocationsFromSection(config, "lastDeathLocations", lastDeathLocations);
+        loadLocationsFromSection(config, "lastTeleportLocations", lastTeleportLocations);
+        loadLocationsFromSection(config, "lastLocations", lastLocations);
+        loadLocationsFromSection(config, "homeLocations", homeLocations);
+        loadWarpsFromSection(config, "warpLocations");
+    }
+
+    /**
+     * Saves location data to the configuration file.
+     * 
+     * @param config The configuration to save to
+     */
+    public static void saveToConfig(FileConfiguration config) {
+        saveLocationsToSection(config, "lastDeathLocations", lastDeathLocations);
+        saveLocationsToSection(config, "lastTeleportLocations", lastTeleportLocations);
+        saveLocationsToSection(config, "lastLocations", lastLocations);
+        saveLocationsToSection(config, "homeLocations", homeLocations);
+        saveWarpsToSection(config, "warpLocations");
+    }
+
+    private static void loadLocationsFromSection(FileConfiguration config, String sectionName, 
+                                               Map<UUID, Location> locationMap) {
+        ConfigurationSection section = config.getConfigurationSection(sectionName);
+        if (section != null) {
+            for (String key : section.getKeys(false)) {
+                try {
+                    UUID playerId = UUID.fromString(key);
+                    Location location = (Location) config.get(sectionName + "." + key);
+                    if (location != null) {
+                        locationMap.put(playerId, location);
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Skip invalid UUID entries
+                }
+            }
+        }
+    }
+
+    private static void loadWarpsFromSection(FileConfiguration config, String sectionName) {
+        ConfigurationSection section = config.getConfigurationSection(sectionName);
+        if (section != null) {
+            for (String key : section.getKeys(false)) {
+                Location location = (Location) config.get(sectionName + "." + key);
+                if (location != null) {
+                    warpLocations.put(key, location);
+                }
+            }
+        }
+    }
+
+    private static void saveLocationsToSection(FileConfiguration config, String sectionName, 
+                                             Map<UUID, Location> locationMap) {
+        for (Map.Entry<UUID, Location> entry : locationMap.entrySet()) {
+            config.set(sectionName + "." + entry.getKey(), entry.getValue());
+        }
+    }
+
+    private static void saveWarpsToSection(FileConfiguration config, String sectionName) {
+        for (Map.Entry<String, Location> entry : warpLocations.entrySet()) {
+            config.set(sectionName + "." + entry.getKey(), entry.getValue());
+        }
+    }
+}

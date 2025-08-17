@@ -1,33 +1,50 @@
-/*    */ package de.pitbully.pitbullyplugin.commands;
-/*    */ 
-/*    */ import de.pitbully.pitbullyplugin.utils.Locations;
-/*    */ import java.util.Objects;
-/*    */ import org.bukkit.Location;
-/*    */ import org.bukkit.command.Command;
-/*    */ import org.bukkit.command.CommandExecutor;
-/*    */ import org.bukkit.command.CommandSender;
-/*    */ import org.bukkit.entity.Player;
-/*    */ import org.jetbrains.annotations.NotNull;
-/*    */ 
-/*    */ 
-/*    */ public class BackCommand
-/*    */   implements CommandExecutor
-/*    */ {
-/*    */   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
-/* 17 */     if (!(commandSender instanceof Player)) return true;
-/*    */     
-/* 19 */     if (Locations.checkLastLocation(((Player)commandSender).getUniqueId())) {
-/* 20 */       ((Player)commandSender).teleport(Objects.<Location>requireNonNull(Locations.getLastLocation(((Player)commandSender).getUniqueId())));
-/*    */     } else {
-/* 22 */       commandSender.sendMessage("§cEs gibt keinen weg zurück!");
-/*    */     } 
-/*    */     
-/* 25 */     return false;
-/*    */   }
-/*    */ }
+package de.pitbully.pitbullyplugin.commands;
 
+import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.utils.SafeTeleport;
+import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\commands\BackCommand.class
- * Java compiler version: 14 (58.0)
- * JD-Core Version:       1.1.3
+/**
+ * Command executor for the /back command.
+ * Teleports players to their last recorded location (death or teleport location).
  */
+public class BackCommand implements CommandExecutor {
+    
+    private static final String NO_LOCATION_MESSAGE = "§cEs gibt keinen Weg zurück!";
+    private static final String TELEPORT_ERROR_MESSAGE = "§cEs gab ein Problem beim teleportieren";
+    
+    @Override
+    public boolean onCommand(@NotNull CommandSender commandSender, 
+                           @NotNull Command command, 
+                           @NotNull String label, 
+                           @NotNull String[] args) {
+        
+        if (!(commandSender instanceof Player)) {
+            return true;
+        }
+        
+        Player player = (Player) commandSender;
+        
+        if (!Locations.checkLastLocation(player.getUniqueId())) {
+            player.sendMessage(NO_LOCATION_MESSAGE);
+            return true;
+        }
+        
+        Location lastLocation = Locations.getLastLocation(player.getUniqueId());
+        if (lastLocation == null) {
+            player.sendMessage(NO_LOCATION_MESSAGE);
+            return true;
+        }
+        
+        if (!SafeTeleport.teleport(player, lastLocation)) {
+            player.sendMessage(TELEPORT_ERROR_MESSAGE);
+        }
+        
+        return true;
+    }
+}
