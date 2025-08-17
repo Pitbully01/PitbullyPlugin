@@ -85,6 +85,10 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("delwarp", new DelWarpCommand(), warpTabCompleter);
         registerCommand("enderchest", new EnderchestCommand());
         registerCommand("workbench", new WorkbenchCommand());
+        
+        // Register aliases manually to ensure they work
+        registerCommand("ec", new EnderchestCommand());
+        registerCommand("wb", new WorkbenchCommand());
     }
     
     /**

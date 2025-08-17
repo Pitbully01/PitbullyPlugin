@@ -23,10 +23,12 @@ commands:
     permission: pit.delwarp
   enderchest:
     permission: pit.enderchest
-    aliases: [ec]
   workbench:
     permission: pit.workbench
-    aliases: [wb]
+  ec:
+    permission: pit.enderchest
+  wb:
+    permission: pit.workbench
 
 permissions:
   pit.home:
