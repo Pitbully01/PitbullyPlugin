@@ -9,9 +9,28 @@ website: https://safekane.de
 commands:
   home:
     permission: pit.home
+    permission-default: true
   sethome:
     permission: pit.sethome
+    permission-default: true
   delhome:
     permission: pit.delhome
+    permission-default: true
   back:
     permission: pit.back
+    permission-default: true
+  setwarp:
+    permission: pit.setwarp
+    permission-default: true
+  warp:
+    permission: pit.warp
+    permission-default: true
+  delwarp:
+    permission: pit.delwarp
+    permission-default: true
+  enderchest:
+    permission: pit.enderchest
+    permission-default: true
+  workbench:
+    permission: pit.workbench
+    permission-default: true

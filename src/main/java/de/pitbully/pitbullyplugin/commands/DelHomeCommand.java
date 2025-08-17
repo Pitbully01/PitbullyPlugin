@@ -9,7 +9,7 @@
 /*    */ import org.bukkit.plugin.java.JavaPlugin;
 /*    */ import org.jetbrains.annotations.NotNull;
 /*    */ 
-/*    */ public class SetHomeCommand implements CommandExecutor {
+/*    */ public class DelHomeCommand implements CommandExecutor {
 /*    */   private JavaPlugin plugin;
 /*    */   
 /*    */   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
@@ -17,19 +17,20 @@
 /* 17 */       return true;
 /*    */     }
 /* 19 */     Player player = (Player)commandSender;
-/*    */ 
-/*    */     
-/* 22 */     Locations.updateHomeLocation(player.getUniqueId(), player.getLocation());
-/* 23 */     player.sendMessage("Home gesetzt! :)");
-/* 24 */     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
-/* 25 */     this.plugin.saveConfig();
-/*    */     
-/* 27 */     return false;
+/* 20 */     if (Locations.checkHomeLocation(player.getUniqueId())) {
+/* 21 */       Locations.deleteHomeLocation(player.getUniqueId());
+/* 22 */       player.sendMessage("Home gelöscht? :(");
+/* 23 */       this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
+/* 24 */       this.plugin.saveConfig();
+/*    */     } else {
+/* 26 */       player.sendMessage("§cKein Home Gesetzt? :(");
+/*    */     } 
+/* 28 */     return false;
 /*    */   }
 /*    */ }
 
 
-/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\commands\SetHomeCommand.class
+/* Location:              C:\Users\Cederik\Downloads\PitbullyPlugin-1.2.6.jar!\de\pitbully\pitbullyplugin\commands\DelHomeCommand.class
  * Java compiler version: 14 (58.0)
  * JD-Core Version:       1.1.3
  */
