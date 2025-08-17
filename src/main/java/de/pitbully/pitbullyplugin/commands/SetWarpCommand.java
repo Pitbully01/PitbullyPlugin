@@ -2,7 +2,6 @@ package de.pitbully.pitbullyplugin.commands;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
 import de.pitbully.pitbullyplugin.utils.Locations;
-import java.util.UUID;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,7 +18,6 @@ public class SetWarpCommand
       return true;
     }
     Player player = (Player)commandSender;
-    UUID uuid = player.getUniqueId();
     execute(player, args);
     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
     this.plugin.saveConfig();

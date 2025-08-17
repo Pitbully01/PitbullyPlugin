@@ -23,6 +23,8 @@ public class LocationListener
       case SPECTATE:
         playerId = event.getPlayer().getUniqueId();
         Locations.updateLastTeleportLocations(playerId, event.getPlayer().getLocation());
+        break;
+      default:
         break; }
   
   }
