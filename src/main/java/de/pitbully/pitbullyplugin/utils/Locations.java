@@ -18,6 +18,7 @@ public class Locations {
     private static final Map<UUID, Location> lastLocations = new HashMap<>();
     private static final Map<UUID, Location> homeLocations = new HashMap<>();
     private static final Map<String, Location> warpLocations = new HashMap<>();
+    private static Location worldSpawnLocation;
 
     // Death Location Methods
     public static void updateLastDeathLocations(UUID playerId, Location location) {
@@ -90,6 +91,20 @@ public class Locations {
         warpLocations.remove(warp);
     }
 
+    // World Spawn Location Methods
+    public static void updateWorldSpawnLocation(Location location) {
+        worldSpawnLocation = location;
+        setWorldSpawn();
+    }
+
+    public static Location getWorldSpawnLocation() {
+        return worldSpawnLocation;
+    }
+
+    public static boolean checkWorldSpawnLocation() {
+        return worldSpawnLocation != null;
+    }
+
     /**
      * Loads location data from the configuration file.
      * 
@@ -100,6 +115,7 @@ public class Locations {
         loadLocationsFromSection(config, "lastTeleportLocations", lastTeleportLocations);
         loadLocationsFromSection(config, "lastLocations", lastLocations);
         loadLocationsFromSection(config, "homeLocations", homeLocations);
+        loadWorldSpawnFromConfig(config);
         loadWarpsFromSection(config, "warpLocations");
     }
 
@@ -113,6 +129,7 @@ public class Locations {
         saveLocationsToSection(config, "lastTeleportLocations", lastTeleportLocations);
         saveLocationsToSection(config, "lastLocations", lastLocations);
         saveLocationsToSection(config, "homeLocations", homeLocations);
+        saveWorldSpawnLocation(config);
         saveWarpsToSection(config, "warpLocations");
     }
 
@@ -146,8 +163,14 @@ public class Locations {
         }
     }
 
-    private static void saveLocationsToSection(FileConfiguration config, String sectionName, 
-                                             Map<UUID, Location> locationMap) {
+    private static void loadWorldSpawnFromConfig(FileConfiguration config) {
+        worldSpawnLocation = (Location) config.get("worldSpawnLocation");
+        if (worldSpawnLocation != null) {
+            setWorldSpawn();
+        }
+    }
+
+    private static void saveLocationsToSection(FileConfiguration config, String sectionName, Map<UUID, Location> locationMap) {
         for (Map.Entry<UUID, Location> entry : locationMap.entrySet()) {
             config.set(sectionName + "." + entry.getKey(), entry.getValue());
         }
@@ -156,6 +179,16 @@ public class Locations {
     private static void saveWarpsToSection(FileConfiguration config, String sectionName) {
         for (Map.Entry<String, Location> entry : warpLocations.entrySet()) {
             config.set(sectionName + "." + entry.getKey(), entry.getValue());
+        }
+    }
+
+    private static void saveWorldSpawnLocation(FileConfiguration config) {
+        config.set("worldSpawnLocation", worldSpawnLocation);
+    }
+
+    private static void setWorldSpawn() {
+        if (worldSpawnLocation != null && worldSpawnLocation.getWorld() != null) {
+            worldSpawnLocation.getWorld().setSpawnLocation(worldSpawnLocation);
         }
     }
 }
