@@ -1,0 +1,29 @@
+# PitbullyPlugin Configuration
+# This file will be automatically populated with player data when the plugin is used.
+# You can manually edit this file, but be careful with the formatting.
+
+# World spawn location (set via /setspawn command)
+worldSpawnLocation: null
+
+# Player home locations (set via /sethome command)
+homeLocations: {}
+
+# Server warp locations (set via /setwarp command)
+warpLocations: {}
+
+# Player last death locations (automatically tracked for /back command)
+lastDeathLocations: {}
+
+# Player last teleport locations (automatically tracked for /back command)
+lastTeleportLocations: {}
+
+# Player last known locations (combination of death and teleport locations)
+lastLocations: {}
+
+# Plugin Information
+# - Use /home to teleport to your home
+# - Use /sethome to set your home location
+# - Use /back to return to your last location (death or teleport)
+# - Use /warp <name> to teleport to warps
+# - Use /enderchest or /ec to access your enderchest
+# - Use /workbench or /wb to open a crafting table

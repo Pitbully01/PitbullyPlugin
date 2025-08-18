@@ -15,9 +15,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class HomeCommand implements CommandExecutor {
     
-    private static final String HOME_SUCCESS_MESSAGE = "Du wurdest zurück nach ♥Hause♥ teleportiert! :)";
-    private static final String TELEPORT_ERROR_MESSAGE = "§cEs gab ein Problem beim teleportieren";
-    private static final String NO_HOME_MESSAGE = "§cKein Home gesetzt";
     
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, 
@@ -26,26 +23,39 @@ public class HomeCommand implements CommandExecutor {
                            @NotNull String[] args) {
         
         if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage("Dieser Befehl kann nur von Spielern ausgeführt werden!");
             return true;
         }
         
         Player player = (Player) commandSender;
+        if (args.length != 0) {
+            player.sendMessage("§cFehler: Dieser Befehl benötigt keine Argumente!");
+            player.sendMessage("§eVerwendung: /home");
+            return true;
+        }
+        
+        if (!player.hasPermission("pitbullyplugin.home")) {
+            player.sendMessage("§cDu hast keine Berechtigung für diesen Befehl!");
+            return true;
+        }
         
         if (!Locations.checkHomeLocation(player.getUniqueId())) {
-            player.sendMessage(NO_HOME_MESSAGE);
+            player.sendMessage("§cKein Home gesetzt!");
+            player.sendMessage("§eVerwende /sethome um dein Home zu setzen.");
             return true;
         }
         
         Location homeLocation = Locations.getHomeLocation(player.getUniqueId());
         if (homeLocation == null) {
-            player.sendMessage(NO_HOME_MESSAGE);
+            player.sendMessage("§cKein Home gesetzt!");
+            player.sendMessage("§eVerwende /sethome um dein Home zu setzen.");
             return true;
         }
         
         if (SafeTeleport.teleport(player, homeLocation)) {
-            player.sendMessage(HOME_SUCCESS_MESSAGE);
+            player.sendMessage("§aDu wurdest zurück nach ♥Hause♥ teleportiert! :)");
         } else {
-            player.sendMessage(TELEPORT_ERROR_MESSAGE);
+            player.sendMessage("§cEs gab ein Problem beim Teleportieren. Versuche es erneut!");
         }
         
         return true;

@@ -9,34 +9,59 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public class DelWarpCommand
-  implements CommandExecutor {
+/**
+ * Command executor for the /delwarp command.
+ * Allows administrators to delete server warp points.
+ * 
+ * <p>This command removes a warp location from the server, making it
+ * unavailable for all players. This is typically an admin-only operation.
+ * 
+ * @author Pitbully01
+ * @since 1.4.4
+ */
+public class DelWarpCommand implements CommandExecutor {
   private JavaPlugin plugin;
   
+  /**
+   * Executes the delwarp command.
+   * 
+   * @param commandSender The command sender
+   * @param command The command that was executed
+   * @param s The alias of the command which was used
+   * @param args The arguments passed to the command (expects warp name)
+   * @return true if the command was handled successfully
+   */
   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
     if (!(commandSender instanceof Player)) {
+      commandSender.sendMessage("Dieser Befehl kann nur von Spielern ausgeführt werden!");
       return true;
     }
     Player player = (Player)commandSender;
-    execute(player, args);
+    
+    if (args.length != 1) {
+      player.sendMessage("§cFehler: Bitte gib einen Warp-Namen an!");
+      player.sendMessage("§eVerwendung: /delwarp <warp-name>");
+      return true;
+    }
+    
+    if (!player.hasPermission("pitbullyplugin.delwarp")) {
+      player.sendMessage("§cDu hast keine Berechtigung für diesen Befehl!");
+      return true;
+    }
+    
+    String warp = args[0];
+    if (!Locations.checkWarpLocation(warp)) {
+      player.sendMessage("§cDer Warp '" + warp + "' existiert nicht!");
+      player.sendMessage("§eVerwende /warps um alle verfügbaren Warps zu sehen.");
+      return true;
+    }
+    
+    Locations.deleteWarpLocation(warp);
+    player.sendMessage("§aDer Warp '" + warp + "' wurde erfolgreich gelöscht! :)");
+    
     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();
     this.plugin.saveConfig();
     
-    return false;
-  }
-
-  
-  private void execute(Player player, String[] args) {
-    if (args.length != 1) {
-      player.sendMessage("zu wenig oder zu viele argumente");
-      return;
-    } 
-    String warp = args[0];
-    if (!Locations.checkWarpLocation(warp)) {
-      player.sendMessage("Der Warp " + warp + " existiert nicht :(");
-      return;
-    } 
-    player.sendMessage("Der Warp " + warp + " wurde gelöscht! :)");
-    Locations.deleteWarpLocation(warp);
+    return true;
   }
 }

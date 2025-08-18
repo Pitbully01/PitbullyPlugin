@@ -4,57 +4,87 @@ main: de.pitbully.pitbullyplugin.PitbullyPlugin
 api-version: '1.21'
 prefix: [PitbullyPlugin]
 authors: [Pitbully01]
-description: a
+description: A Minecraft plugin providing teleportation commands like home, warp, and back functionality
 website: https://nalumina.de
+
 commands:
   home:
-    permission: pit.home
+    description: Teleport to your home location
+    usage: /home
+    permission: pitbullyplugin.home
   sethome:
-    permission: pit.sethome
+    description: Set your home location
+    usage: /sethome
+    permission: pitbullyplugin.sethome
   delhome:
-    permission: pit.delhome
+    description: Delete your home location
+    usage: /delhome
+    permission: pitbullyplugin.delhome
   back:
-    permission: pit.back
+    description: Teleport back to your previous location
+    usage: /back
+    permission: pitbullyplugin.back
   setwarp:
-    permission: pit.setwarp
+    description: Set a warp point
+    usage: /setwarp <warp-name>
+    permission: pitbullyplugin.setwarp
   warp:
-    permission: pit.warp
+    description: Teleport to a warp point
+    usage: /warp <warp-name>
+    permission: pitbullyplugin.warp
   delwarp:
-    permission: pit.delwarp
+    description: Delete a warp point
+    usage: /delwarp <warp-name>
+    permission: pitbullyplugin.delwarp
   enderchest:
-    permission: pit.enderchest
+    description: Open your enderchest or another player's enderchest
+    usage: /enderchest [player-name]
+    permission: pitbullyplugin.enderchest
+    aliases: [ec]
   workbench:
-    permission: pit.workbench
-  ec:
-    permission: pit.enderchest
-  wb:
-    permission: pit.workbench
+    description: Open a workbench
+    usage: /workbench
+    permission: pitbullyplugin.workbench
+    aliases: [wb]
+  setspawn:
+    description: Set the world spawn location
+    usage: /setspawn
+    permission: pitbullyplugin.setworldspawn
 
 permissions:
-  pit.home:
+  pitbullyplugin.home:
     description: Allows the player to teleport to their home
     default: true
-  pit.sethome:
+  pitbullyplugin.sethome:
     description: Allows the player to set their home location
     default: true
-  pit.delhome:
+  pitbullyplugin.delhome:
     description: Allows the player to delete their home location
     default: true
-  pit.back:
+  pitbullyplugin.back:
     description: Allows the player to teleport back to their previous location
     default: true
-  pit.setwarp:
+  pitbullyplugin.setwarp:
     description: Allows the player to set warp points
     default: true
-  pit.warp:
+  pitbullyplugin.warp:
     description: Allows the player to use warp points
     default: true
-  pit.delwarp:
+  pitbullyplugin.delwarp:
     description: Allows the player to delete warp points
     default: true
-  pit.enderchest:
-    description: Allows the player to access their enderchest
+  pitbullyplugin.enderchest:
+    description: Allows the player to access their own enderchest
     default: true
-  pit.workbench:
+  pitbullyplugin.enderchest.others:
+    description: Allows the player to access other players' enderchests
+    default: op
+  pitbullyplugin.workbench:
     description: Allows the player to open a workbench
+    default: true
+  pitbullyplugin.setworldspawn:
+    description: Allows the player to set the world spawn location
+    default: true
+  pitbullyplugin.keepxp:
+    description: Allows the player to keep experience on death
     default: true
