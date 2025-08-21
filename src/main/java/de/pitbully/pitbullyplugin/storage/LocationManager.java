@@ -47,7 +47,7 @@ public class LocationManager {
             DatabaseConfig dbConfig = configManager.getDatabaseConfig();
             if (dbConfig == null) {
                 logger.severe("Database storage is enabled but configuration is invalid! Falling back to file storage.");
-                initializeFileStorage(dataFolder, logger, null);
+                initializeFileStorage(dataFolder, logger);
                 return;
             }
             
@@ -80,20 +80,20 @@ public class LocationManager {
                 logger.severe("Failed to initialize database storage: " + e.getMessage());
                 logger.severe("Falling back to file storage...");
                 e.printStackTrace();
-                initializeFileStorage(dataFolder, logger, null);
+                initializeFileStorage(dataFolder, logger);
             }
             
         } else {
             // Initialize file storage
-            initializeFileStorage(dataFolder, logger, null);
+            initializeFileStorage(dataFolder, logger);
         }
     }
     
     /**
-     * Initializes file storage with optional migration from old config.
+     * Initializes file storage.
      */
-    private static void initializeFileStorage(File dataFolder, Logger logger, org.bukkit.configuration.file.FileConfiguration oldConfig) {
-        storage = new FileLocationStorage(dataFolder, logger, oldConfig);
+    private static void initializeFileStorage(File dataFolder, Logger logger) {
+        storage = new FileLocationStorage(dataFolder, logger);
         logger.info("File storage initialized successfully.");
     }
     

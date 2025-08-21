@@ -50,6 +50,10 @@ commands:
     description: Set the world spawn location
     usage: /setspawn
     permission: pitbullyplugin.setworldspawn
+  pitbullyinfo:
+    description: Display detailed plugin information and version details
+    usage: /pitbullyinfo
+    permission: pitbullyplugin.info
 
 permissions:
   pitbullyplugin.home:
@@ -88,3 +92,6 @@ permissions:
   pitbullyplugin.keepxp:
     description: Allows the player to keep experience on death
     default: true
+  pitbullyplugin.info:
+    description: Allows the player to view detailed plugin information
+    default: op

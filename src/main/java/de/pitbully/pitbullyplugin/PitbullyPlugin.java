@@ -5,6 +5,7 @@ import de.pitbully.pitbullyplugin.commands.DelHomeCommand;
 import de.pitbully.pitbullyplugin.commands.DelWarpCommand;
 import de.pitbully.pitbullyplugin.commands.EnderchestCommand;
 import de.pitbully.pitbullyplugin.commands.HomeCommand;
+import de.pitbully.pitbullyplugin.commands.PluginInfoCommand;
 import de.pitbully.pitbullyplugin.commands.SetHomeCommand;
 import de.pitbully.pitbullyplugin.commands.SetWarpCommand;
 import de.pitbully.pitbullyplugin.commands.SetWorldSpawnCommand;
@@ -17,6 +18,7 @@ import de.pitbully.pitbullyplugin.storage.FileLocationStorage;
 import de.pitbully.pitbullyplugin.storage.LocationManager;
 import de.pitbully.pitbullyplugin.storage.LocationStorage;
 import de.pitbully.pitbullyplugin.utils.ConfigManager;
+import de.pitbully.pitbullyplugin.utils.PluginInfo;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,7 +46,7 @@ import java.util.Objects;
  * back command, and utility commands like enderchest and workbench access.
  * 
  * @author Pitbully01
- * @version 1.4.4
+ * @version 1.5.3
  * @since 1.0.0
  */
 public final class PitbullyPlugin extends JavaPlugin {
@@ -64,6 +66,9 @@ public final class PitbullyPlugin extends JavaPlugin {
     /** The configuration manager */
     private ConfigManager configManager;
     
+    /** Auto-save task ID for periodic saving */
+    private int autoSaveTaskId = -1;
+    
     /**
      * Called when the plugin is enabled.
      * Initializes all plugin components and loads configuration.
@@ -71,6 +76,11 @@ public final class PitbullyPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        
+        // Initialize plugin information system
+        PluginInfo.initialize(getLogger());
+        
+        getLogger().info("Initializing " + PluginInfo.getFullVersionInfo() + "...");
         
         // Step 1: Initialize basic config file structure
         initConfig();
@@ -88,7 +98,14 @@ public final class PitbullyPlugin extends JavaPlugin {
         // Step 5: Load final configuration
         loadConfig();
         
-        getLogger().info("PitbullyPlugin has been enabled!");
+        // Step 6: Start auto-save task (save every 5 minutes)
+        startAutoSaveTask();
+        
+        // Step 7: Perform initial save to ensure all configs are written
+        saveConfig();
+        
+        getLogger().info(PluginInfo.getName() + " successfully enabled! " + 
+            (configManager.isDatabaseStorageEnabled() ? "Database" : "File") + " storage active.");
     }
     
     /**
@@ -97,13 +114,19 @@ public final class PitbullyPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        // Cancel auto-save task
+        if (autoSaveTaskId != -1) {
+            getServer().getScheduler().cancelTask(autoSaveTaskId);
+            autoSaveTaskId = -1;
+        }
+        
         // Save and close storage properly
         if (locationStorage != null) {
             locationStorage.close();
         }
         
         saveConfig();
-        getLogger().info("PitbullyPlugin has been disabled!");
+        getLogger().info(PluginInfo.getName() + " has been disabled!");
     }
     
     /**
@@ -130,9 +153,27 @@ public final class PitbullyPlugin extends JavaPlugin {
      * Creates the config file handle and loads it if it exists.
      */
     private void initConfig() {
+        // Ensure data folder exists
+        if (!getDataFolder().exists()) {
+            getDataFolder().mkdirs();
+        }
+        
+        this.configFile = new File(getDataFolder(), "config.yml");
+        
+        // Create config from default resource if it doesn't exist
+        if (!this.configFile.exists()) {
+            saveDefaultConfig();
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                getLogger().info("[DEBUG] Created new config.yml from defaults.");
+            }
+        }
+        
+        this.config = YamlConfiguration.loadConfiguration(this.configFile);
+        
+        // Ensure config is properly loaded and not empty
         if (this.config == null) {
-            this.configFile = new File(getDataFolder(), "config.yml");
-            this.config = YamlConfiguration.loadConfiguration(this.configFile);
+            this.config = new YamlConfiguration();
+            getLogger().warning("Config was null, created new YamlConfiguration.");
         }
     }
     
@@ -157,13 +198,14 @@ public final class PitbullyPlugin extends JavaPlugin {
             // Get the initialized storage from LocationManager
             this.locationStorage = LocationManager.getStorage();
             
-            // Clean up old location data from config.yml after migration (if applicable)
-            cleanupOldLocationData();
-            
             if (configManager.isDatabaseStorageEnabled()) {
-                getLogger().info("Database storage initialized successfully.");
+                if (configManager.isDebugModeEnabled()) {
+                    getLogger().info("[DEBUG] Database storage initialized successfully.");
+                }
             } else {
-                getLogger().info("File storage initialized successfully.");
+                if (configManager.isDebugModeEnabled()) {
+                    getLogger().info("[DEBUG] File storage initialized successfully.");
+                }
             }
             
         } catch (Exception e) {
@@ -172,37 +214,11 @@ public final class PitbullyPlugin extends JavaPlugin {
             
             // Fallback to file storage
             getLogger().info("Falling back to file storage...");
-            this.locationStorage = new FileLocationStorage(getDataFolder(), getLogger(), this.config);
+            this.locationStorage = new FileLocationStorage(getDataFolder(), getLogger());
             LocationManager.initialize(this.locationStorage);
-            cleanupOldLocationData();
         }
     }
-    
-    /**
-     * Removes old location data from config.yml after successful migration.
-     * This keeps the config.yml clean for actual plugin configuration.
-     */
-    private void cleanupOldLocationData() {
-        boolean needsSave = false;
-        
-        // Remove old location sections if they exist
-        for (String section : new String[]{"lastDeathLocations", "lastTeleportLocations", 
-                                          "lastLocations", "homeLocations", "warpLocations", "worldSpawnLocation"}) {
-            if (this.config.contains(section)) {
-                this.config.set(section, null);
-                needsSave = true;
-            }
-        }
-        
-        if (needsSave) {
-            try {
-                this.config.save(this.configFile);
-                getLogger().info("Cleaned up old location data from config.yml");
-            } catch (Exception e) {
-                getLogger().warning("Could not clean up old location data from config.yml: " + e.getMessage());
-            }
-        }
-    }
+
     
     /**
      * Register all plugin commands.
@@ -222,6 +238,7 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("enderchest", new EnderchestCommand());
         registerCommand("workbench", new WorkbenchCommand());
         registerCommand("setspawn", new SetWorldSpawnCommand());
+        registerCommand("pitbullyinfo", new PluginInfoCommand());
         
         // Register aliases manually to ensure they work
         registerCommand("ec", new EnderchestCommand());
@@ -269,24 +286,48 @@ public final class PitbullyPlugin extends JavaPlugin {
      * Creates a new config file if none exists.
      */
     private void loadConfig() {
-        if (this.config == null) {
-            getLogger().warning("Config not initialized. Skipping load.");
-            return;
+        if (this.config == null || this.configFile == null) {
+            getLogger().warning("Config not initialized. Initializing now...");
+            initConfig();
         }
         
         if (!this.configFile.exists() || this.configFile.length() == 0L) {
-            getLogger().info("Config.yml not found or empty. Creating new configuration with default values.");
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                getLogger().info("[DEBUG] Config.yml not found or empty. Creating new configuration with default values.");
+            }
             // Create parent directories if they don't exist
             if (!getDataFolder().exists()) {
                 getDataFolder().mkdirs();
             }
-            saveConfig(); // Save empty config to create the file
+            
+            // Let ConfigManager handle the defaults
+            if (configManager != null) {
+                configManager.loadConfig();
+            }
+            
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                getLogger().info("[DEBUG] Default configuration created. Will be saved with location data.");
+            }
             return;
         }
         
         try {
-            LocationManager.loadFromConfig();
-            getLogger().info("Configuration loaded successfully.");
+            // Reload from file
+            this.config = YamlConfiguration.loadConfiguration(this.configFile);
+            
+            // Let ConfigManager reload its settings
+            if (configManager != null) {
+                configManager.reload();
+            }
+            
+            // Load location data
+            if (LocationManager.getStorage() != null) {
+                LocationManager.loadFromConfig();
+            }
+            
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                getLogger().info("[DEBUG] Configuration loaded successfully from " + configFile.getName());
+            }
         } catch (Exception e) {
             getLogger().severe("Error loading configuration: " + e.getMessage());
             e.printStackTrace();
@@ -306,9 +347,13 @@ public final class PitbullyPlugin extends JavaPlugin {
      * </ul>
      */
     public void saveConfig() {
-        if (this.config == null) {
-            getLogger().warning("Config not initialized. Skipping save.");
-            return;
+        if (this.config == null || this.configFile == null) {
+            getLogger().warning("Config not initialized. Initializing now...");
+            initConfig();
+            if (this.config == null) {
+                getLogger().severe("Failed to initialize config. Cannot save.");
+                return;
+            }
         }
         
         // Ensure data folder exists
@@ -316,14 +361,60 @@ public final class PitbullyPlugin extends JavaPlugin {
             getDataFolder().mkdirs();
         }
         
-        LocationManager.saveToConfig();
+        // Save location data first (but only if LocationManager is initialized)
+        try {
+            if (LocationManager.getStorage() != null) {
+                LocationManager.saveToConfig();
+            } else {
+                if (configManager != null && configManager.isDebugModeEnabled()) {
+                    getLogger().info("[DEBUG] LocationManager not yet initialized, skipping location data save.");
+                }
+            }
+        } catch (IllegalStateException e) {
+            // LocationManager not initialized yet, that's fine during startup
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                getLogger().info("[DEBUG] Saving config without location data (LocationManager not yet ready).");
+            }
+        }
         
         try {
             this.config.save(this.configFile);
-            getLogger().info("Configuration saved successfully.");
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                getLogger().info("[DEBUG] Configuration saved successfully to " + this.configFile.getName());
+            }
         } catch (IOException e) {
             getLogger().severe("Could not save config to " + this.configFile + ": " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Starts the auto-save task that periodically saves configuration and location data.
+     * Saves data every 5 minutes (6000 ticks) to prevent data loss.
+     */
+    private void startAutoSaveTask() {
+        // Cancel existing task if running
+        if (autoSaveTaskId != -1) {
+            getServer().getScheduler().cancelTask(autoSaveTaskId);
+        }
+        
+        // Start new auto-save task (every 5 minutes = 6000 ticks)
+        autoSaveTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    saveConfig();
+                    if (configManager != null && configManager.isDebugModeEnabled()) {
+                        getLogger().info("[DEBUG] Auto-save completed successfully.");
+                    }
+                } catch (Exception e) {
+                    getLogger().warning("Error during auto-save: " + e.getMessage());
+                }
+            }
+        }, 6000L, 6000L); // Initial delay: 5 minutes, Repeat every: 5 minutes
+        
+        if (configManager != null && configManager.isDebugModeEnabled()) {
+            getLogger().info("[DEBUG] Auto-save task started (saves every 5 minutes).");
         }
     }
 }

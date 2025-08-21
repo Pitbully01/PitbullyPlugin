@@ -59,66 +59,56 @@ public class FileLocationStorage implements LocationStorage {
             dataFolder.mkdirs();
         }
         
-        // Load or create the locations configuration
-        this.locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
-        
-        logger.info("FileLocationStorage initialized with locations file: " + this.locationsFile.getAbsolutePath());
-    }
-    
-    /**
-     * Creates a new FileLocationStorage instance with migration from existing config.
-     * This constructor is used to migrate data from the old config.yml format.
-     * 
-     * @param dataFolder The plugin's data folder where locations.yml will be stored
-     * @param logger Logger for error reporting
-     * @param oldConfig The old configuration to migrate from (optional)
-     */
-    public FileLocationStorage(File dataFolder, Logger logger, FileConfiguration oldConfig) {
-        this(dataFolder, logger);
-        
-        // If there's an old config and no existing locations file, migrate the data
-        if (oldConfig != null && !locationsFile.exists() && hasLocationData(oldConfig)) {
-            logger.info("Migrating location data from config.yml to locations.yml...");
-            migrateFromOldConfig(oldConfig);
-            saveConfigFile();
-            logger.info("Migration completed successfully!");
-        }
-    }
-    
-    /**
-     * Checks if the old configuration contains location data.
-     * 
-     * @param config The configuration to check
-     * @return true if location data is found
-     */
-    private boolean hasLocationData(FileConfiguration config) {
-        return config.contains("lastDeathLocations") || 
-               config.contains("lastTeleportLocations") || 
-               config.contains("lastLocations") || 
-               config.contains("homeLocations") || 
-               config.contains("warpLocations") || 
-               config.contains("worldSpawnLocation");
-    }
-    
-    /**
-     * Migrates location data from the old config format to the new locations file.
-     * 
-     * @param oldConfig The old configuration containing location data
-     */
-    private void migrateFromOldConfig(FileConfiguration oldConfig) {
-        // Copy all location sections to the new config
-        for (String section : new String[]{"lastDeathLocations", "lastTeleportLocations", 
-                                          "lastLocations", "homeLocations", "warpLocations"}) {
-            if (oldConfig.contains(section)) {
-                locationsConfig.set(section, oldConfig.get(section));
+        // Load existing configuration or create empty one
+        if (this.locationsFile.exists() && this.locationsFile.length() > 0) {
+            this.locationsConfig = YamlConfiguration.loadConfiguration(this.locationsFile);
+            if (PitbullyPlugin.getInstance() != null && 
+                PitbullyPlugin.getInstance().getConfigManager() != null && 
+                PitbullyPlugin.getInstance().getConfigManager().isDebugModeEnabled()) {
+                logger.info("[DEBUG] Loaded existing locations.yml with " + this.locationsFile.length() + " bytes of data.");
+            }
+        } else {
+            this.locationsConfig = new YamlConfiguration();
+            // Initialize with default structure to prevent empty file
+            initializeDefaultStructure();
+            if (PitbullyPlugin.getInstance() != null && 
+                PitbullyPlugin.getInstance().getConfigManager() != null && 
+                PitbullyPlugin.getInstance().getConfigManager().isDebugModeEnabled()) {
+                logger.info("[DEBUG] Created new locations.yml configuration structure.");
             }
         }
         
-        // Copy world spawn location
-        if (oldConfig.contains("worldSpawnLocation")) {
-            locationsConfig.set("worldSpawnLocation", oldConfig.get("worldSpawnLocation"));
+        // WICHTIG: Lade existierende Daten sofort in die Maps
+        if (this.locationsFile.exists() && this.locationsFile.length() > 0) {
+            loadAll();
+            if (PitbullyPlugin.getInstance() != null && 
+                PitbullyPlugin.getInstance().getConfigManager() != null && 
+                PitbullyPlugin.getInstance().getConfigManager().isDebugModeEnabled()) {
+                logger.info("[DEBUG] Loaded existing location data from file.");
+            }
+        }
+        
+        if (PitbullyPlugin.getInstance() != null && 
+            PitbullyPlugin.getInstance().getConfigManager() != null && 
+            PitbullyPlugin.getInstance().getConfigManager().isDebugModeEnabled()) {
+            logger.info("[DEBUG] FileLocationStorage initialized with locations file: " + this.locationsFile.getAbsolutePath());
         }
     }
+    
+    /**
+     * Initializes the default structure for locations.yml to prevent completely empty files.
+     */
+    private void initializeDefaultStructure() {
+        locationsConfig.set("worldSpawnLocation", null);
+        locationsConfig.set("homeLocations", new HashMap<String, Object>());
+        locationsConfig.set("warpLocations", new HashMap<String, Object>());
+        locationsConfig.set("lastDeathLocations", new HashMap<String, Object>());
+        locationsConfig.set("lastTeleportLocations", new HashMap<String, Object>());
+        locationsConfig.set("lastLocations", new HashMap<String, Object>());
+    }
+    
+
+
 
     /**
      * Saves a player's death location.
@@ -205,6 +195,27 @@ public class FileLocationStorage implements LocationStorage {
     @Override
     public Location getLastLocation(UUID playerId) {
         return lastLocations.get(playerId);
+    }
+
+    /**
+     * Checks if a player has a last known location.
+     * 
+     * @param playerId The UUID of the player
+     * @return true if the player has a last location, false otherwise
+     */
+    @Override
+    public boolean checkLastLocation(UUID playerId) {
+        return lastLocations.containsKey(playerId);
+    }
+
+    /**
+     * Checks if a world spawn location is set.
+     * 
+     * @return true if world spawn is set, false otherwise
+     */
+    @Override
+    public boolean checkWorldSpawnLocation() {
+        return worldSpawn != null;
     }
 
     /**
@@ -404,10 +415,9 @@ public class FileLocationStorage implements LocationStorage {
             PitbullyPlugin plugin = PitbullyPlugin.getInstance();
             ConfigManager configManager = plugin != null ? plugin.getConfigManager() : null;
             
-            if (configManager != null) {
-                configManager.debug("Location data saved successfully to " + locationsFile.getName());
+            if (configManager != null && configManager.isDebugModeEnabled()) {
+                logger.info("[DEBUG] Location data saved successfully to " + locationsFile.getName());
             }
-            logger.info("Location data saved successfully to " + locationsFile.getName());
         } catch (IOException e) {
             logger.severe("Could not save locations to " + locationsFile.getAbsolutePath() + ": " + e.getMessage());
             e.printStackTrace();

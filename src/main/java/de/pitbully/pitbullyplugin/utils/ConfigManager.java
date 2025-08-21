@@ -19,7 +19,7 @@ import java.io.File;
  * </ul>
  * 
  * @author Pitbully01
- * @version 1.5.1
+ * @version 1.5.3
  * @since 1.5.1
  */
 public class ConfigManager {
@@ -62,8 +62,14 @@ public class ConfigManager {
      * This method is safe to call after location migration.
      */
     public void loadConfig() {
+        // Ensure data folder exists
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdirs();
+        }
+        
         // Only save default config if the file doesn't exist yet
-        if (!plugin.getDataFolder().exists() || !new File(plugin.getDataFolder(), "config.yml").exists()) {
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
             plugin.saveDefaultConfig();
         }
         
@@ -73,24 +79,10 @@ public class ConfigManager {
         // Set default values if they don't exist (but don't overwrite migration cleanup)
         setDefaults();
         
-        // Only save if we actually added new settings
-        if (hasNewSettings()) {
-            plugin.saveConfig();
+        // Don't save automatically during construction - will be saved later
+        if (isDebugModeEnabled()) {
+            plugin.getLogger().info("[DEBUG] Configuration loaded successfully.");
         }
-    }
-    
-    /**
-     * Check if new settings were added that need to be saved.
-     * 
-     * @return true if new settings were added
-     */
-    private boolean hasNewSettings() {
-        return !config.contains("settings.create-backups") ||
-               !config.contains("settings.debug-mode") ||
-               !config.contains("settings.teleport.safety-check") ||
-               !config.contains("settings.teleport.max-safe-distance") ||
-               !config.contains("database.storage-type") ||
-               !config.contains("database.connection.type");
     }
     
     /**
@@ -214,7 +206,28 @@ public class ConfigManager {
      * Reload the configuration from file.
      */
     public void reload() {
-        loadConfig();
+        plugin.reloadConfig();
+        this.config = plugin.getConfig();
+        setDefaults();
+        
+        // Only save if LocationManager is initialized
+        try {
+            // Check if LocationManager is available before saving
+            if (de.pitbully.pitbullyplugin.storage.LocationManager.getStorage() != null) {
+                plugin.saveConfig();
+            } else {
+                if (isDebugModeEnabled()) {
+                    plugin.getLogger().info("[DEBUG] LocationManager not yet initialized, skipping auto-save during reload.");
+                }
+            }
+        } catch (IllegalStateException e) {
+            // LocationManager not initialized yet, that's fine during startup
+            if (isDebugModeEnabled()) {
+                plugin.getLogger().info("[DEBUG] Configuration reloaded, will be saved after full initialization.");
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to save config during reload: " + e.getMessage());
+        }
     }
     
     /**

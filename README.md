@@ -1,16 +1,8 @@
 # PitbullyPlugin
 
-[![Version](https://img.shields.io/badge/version-1.5.2-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
+[![Version](https://img.shields.io/badge/version-1.5.3-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
 [![Minecraft](https://img.shields.io/badge/minecraft-1.21.8-green.svg)](https://www.minecraft.net/)
-[![Java](https://img.shields.io/3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.2.jar`
-
-### Development Requirements
-- Java 21 JDK
-- Maven 3.6+
-- Paper API 1.21.3
-
-### Database Development
-For database feature development, see [Database Setup Guide](DATABASE_SETUP.md) for driver installation.java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
+[![Java](https://img.shields.io/badge/java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 
 A comprehensive Minecraft plugin providing teleportation commands including homes, warps, and back functionality for Paper/Spigot servers.
@@ -281,7 +273,7 @@ See [Database Setup Guide](DATABASE_SETUP.md) for detailed instructions.
    mvn clean package
    ```
 
-3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.1.jar`
+3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.3.jar`
 
 ### Development Requirements
 - Java 21 JDK

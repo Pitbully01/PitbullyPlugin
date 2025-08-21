@@ -6,7 +6,7 @@
 
     <groupId>de.pitbully</groupId>
     <artifactId>PitbullyPlugin</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.3</version>
     <packaging>jar</packaging>
 
     <name>PitbullyPlugin</name>
@@ -17,6 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
     </properties>
     <url>https://github.com/Pitbully01/PitbullyPlugin</url>
 
