@@ -1,29 +1,41 @@
 # PitbullyPlugin Configuration
-# This file will be automatically populated with player data when the plugin is used.
-# You can manually edit this file, but be careful with the formatting.
+# This file contains plugin settings and configuration options.
+# Location data (homes, warps, etc.) is stored separately in locations.yml
 
-# World spawn location (set via /setspawn command)
-worldSpawnLocation: null
+# Plugin Settings
+settings:
+  # Whether to automatically create backup files
+  create-backups: true
+  
+  # Whether to show debug messages in console
+  debug-mode: false
+  
+  # Teleportation safety settings
+  teleport:
+    # Check for safe teleport locations (avoid suffocation, lava, etc.)
+    safety-check: true
+    # Maximum distance to search for safe location
+    max-safe-distance: 10
 
-# Player home locations (set via /sethome command)
-homeLocations: {}
-
-# Server warp locations (set via /setwarp command)
-warpLocations: {}
-
-# Player last death locations (automatically tracked for /back command)
-lastDeathLocations: {}
-
-# Player last teleport locations (automatically tracked for /back command)
-lastTeleportLocations: {}
-
-# Player last known locations (combination of death and teleport locations)
-lastLocations: {}
-
-# Plugin Information
-# - Use /home to teleport to your home
-# - Use /sethome to set your home location
-# - Use /back to return to your last location (death or teleport)
-# - Use /warp <name> to teleport to warps
-# - Use /enderchest or /ec to access your enderchest
-# - Use /workbench or /wb to open a crafting table
+# Plugin Information & Commands
+# 🏠 Home Commands:
+#   - /home - Teleport to your home location
+#   - /sethome - Set your home location
+#   - /delhome - Delete your home location
+#
+# 🌍 Warp Commands:
+#   - /warp <name> - Teleport to a warp point
+#   - /setwarp <name> - Set a warp point (requires permission)
+#   - /delwarp <name> - Delete a warp point (requires permission)
+#
+# ⏪ Utility Commands:
+#   - /back - Return to your last location (death or teleport)
+#   - /setspawn - Set the world spawn location (requires permission)
+#
+# 🎒 Convenience Commands:
+#   - /enderchest or /ec - Access your enderchest
+#   - /workbench or /wb - Open a crafting table
+#
+# 📁 Data Storage:
+#   - Plugin settings: config.yml (this file)
+#   - Location data: locations.yml (automatically created)

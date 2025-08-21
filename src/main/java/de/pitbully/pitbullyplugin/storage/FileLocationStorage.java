@@ -1,11 +1,17 @@
 package de.pitbully.pitbullyplugin.storage;
 
+import de.pitbully.pitbullyplugin.PitbullyPlugin;
+import de.pitbully.pitbullyplugin.utils.ConfigManager;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -385,15 +391,71 @@ public class FileLocationStorage implements LocationStorage {
     
     /**
      * Saves the locations configuration to the file system.
+     * Creates a backup if enabled in configuration.
      * Handles any IO exceptions that may occur during file writing.
      */
     private void saveConfigFile() {
         try {
+            // Create backup if enabled
+            createBackupIfEnabled();
+            
             locationsConfig.save(locationsFile);
+            
+            PitbullyPlugin plugin = PitbullyPlugin.getInstance();
+            ConfigManager configManager = plugin != null ? plugin.getConfigManager() : null;
+            
+            if (configManager != null) {
+                configManager.debug("Location data saved successfully to " + locationsFile.getName());
+            }
             logger.info("Location data saved successfully to " + locationsFile.getName());
         } catch (IOException e) {
             logger.severe("Could not save locations to " + locationsFile.getAbsolutePath() + ": " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Creates a backup of the locations file if backup creation is enabled.
+     * Backup files are named with timestamp format: locations_YYYY-MM-dd_HH-mm-ss.yml.bak
+     */
+    private void createBackupIfEnabled() {
+        try {
+            PitbullyPlugin plugin = PitbullyPlugin.getInstance();
+            ConfigManager configManager = plugin != null ? plugin.getConfigManager() : null;
+            
+            // If config manager is not available, assume backups are enabled (safe default)
+            boolean createBackups = configManager == null || configManager.isCreateBackupsEnabled();
+            
+            if (!createBackups) {
+                return;
+            }
+            
+            // Only create backup if the file exists and is not empty
+            if (!locationsFile.exists() || locationsFile.length() == 0) {
+                return;
+            }
+            
+            // Create backup directory
+            File backupDir = new File(locationsFile.getParent(), "backups");
+            if (!backupDir.exists()) {
+                backupDir.mkdirs();
+            }
+            
+            // Generate backup filename with timestamp
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String timestamp = dateFormat.format(new Date());
+            String backupFileName = "locations_" + timestamp + ".yml.bak";
+            File backupFile = new File(backupDir, backupFileName);
+            
+            // Copy file to backup location
+            Files.copy(locationsFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            
+            if (configManager != null) {
+                configManager.debug("Created backup: " + backupFile.getName());
+            }
+            
+        } catch (IOException e) {
+            logger.warning("Failed to create backup of locations file: " + e.getMessage());
         }
     }
 

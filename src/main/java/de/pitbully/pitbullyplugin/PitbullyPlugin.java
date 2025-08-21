@@ -16,6 +16,7 @@ import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
 import de.pitbully.pitbullyplugin.storage.FileLocationStorage;
 import de.pitbully.pitbullyplugin.storage.LocationManager;
 import de.pitbully.pitbullyplugin.storage.LocationStorage;
+import de.pitbully.pitbullyplugin.utils.ConfigManager;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -60,6 +61,9 @@ public final class PitbullyPlugin extends JavaPlugin {
     /** The location storage implementation */
     private LocationStorage locationStorage;
     
+    /** The configuration manager */
+    private ConfigManager configManager;
+    
     /**
      * Called when the plugin is enabled.
      * Initializes all plugin components and loads configuration.
@@ -68,10 +72,20 @@ public final class PitbullyPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         
+        // Step 1: Initialize basic config file structure
         initConfig();
+        
+        // Step 2: Initialize location storage (this handles migration from old config)
         initLocationStorage();
+        
+        // Step 3: Now initialize config manager (after migration is complete)
+        initConfigManager();
+        
+        // Step 4: Register commands and events
         registerCommands();
         registerEvents();
+        
+        // Step 5: Load final configuration
         loadConfig();
         
         getLogger().info("PitbullyPlugin has been enabled!");
@@ -98,6 +112,15 @@ public final class PitbullyPlugin extends JavaPlugin {
     }
     
     /**
+     * Get the configuration manager instance.
+     * 
+     * @return The configuration manager
+     */
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+    
+    /**
      * Initialize the configuration file.
      * Creates the config file handle and loads it if it exists.
      */
@@ -106,6 +129,14 @@ public final class PitbullyPlugin extends JavaPlugin {
             this.configFile = new File(getDataFolder(), "config.yml");
             this.config = YamlConfiguration.loadConfiguration(this.configFile);
         }
+    }
+    
+    /**
+     * Initialize the configuration manager.
+     * Creates the config manager instance that handles all plugin settings.
+     */
+    private void initConfigManager() {
+        this.configManager = new ConfigManager(this);
     }
     
     /**

@@ -1,0 +1,27 @@
+# PitbullyPlugin Location Data
+# This file stores all location-related data (homes, warps, last locations)
+# This file is automatically managed by the plugin - manual editing is possible but not recommended
+# Format: All locations are stored as "world,x,y,z,yaw,pitch"
+
+# World spawn location (set via /setspawn command)
+worldSpawnLocation: null
+
+# Player home locations (set via /sethome command)
+# Format: player-uuid: "world,x,y,z,yaw,pitch"
+homeLocations: {}
+
+# Server warp locations (set via /setwarp command)
+# Format: warp-name: "world,x,y,z,yaw,pitch"
+warpLocations: {}
+
+# Player last death locations (automatically tracked for /back command)
+# Format: player-uuid: "world,x,y,z,yaw,pitch"
+lastDeathLocations: {}
+
+# Player last teleport locations (automatically tracked for /back command)
+# Format: player-uuid: "world,x,y,z,yaw,pitch"
+lastTeleportLocations: {}
+
+# Player last known locations (combination of death and teleport locations)
+# Format: player-uuid: "world,x,y,z,yaw,pitch"
+lastLocations: {}

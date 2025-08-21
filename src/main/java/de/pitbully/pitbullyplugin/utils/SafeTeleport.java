@@ -1,5 +1,6 @@
 package de.pitbully.pitbullyplugin.utils;
 
+import de.pitbully.pitbullyplugin.PitbullyPlugin;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -11,6 +12,8 @@ import org.bukkit.entity.Player;
  * preventing players from being teleported into blocks or falling into the void.
  * It supports modern Minecraft world heights (-64 to 319).
  * 
+ * <p>Safety checks can be configured in the config.yml file under settings.teleport.
+ * 
  * @author Pitbully01
  * @since 1.4.4
  */
@@ -19,12 +22,17 @@ public class SafeTeleport {
     /** Maximum world height for modern Minecraft versions (1.18+) */
     private static final int MAX_WORLD_HEIGHT = 319;
     
+    /** Default maximum distance to search for safe location */
+    private static final int DEFAULT_MAX_SAFE_DISTANCE = 10;
+    
     /**
      * Safely teleports a player to the specified location.
      * Searches for a safe spot near the target location if necessary.
      * 
-     * <p>This method first attempts to find a safe location near the target.
-     * If a safe location is found, the player is teleported there.
+     * <p>This method first checks if safety checks are enabled in config.
+     * If disabled, performs direct teleportation. If enabled, searches for
+     * a safe location near the target. If a safe location is found, the 
+     * player is teleported there.
      * 
      * @param player The player to teleport (must not be null)
      * @param location The target location (must not be null with valid world)
@@ -35,10 +43,26 @@ public class SafeTeleport {
             return false;
         }
         
-        Location safeLoc = findSafeLocation(location);
+        // Get config manager (may be null during initialization)
+        PitbullyPlugin plugin = PitbullyPlugin.getInstance();
+        ConfigManager configManager = plugin != null ? plugin.getConfigManager() : null;
+        
+        // If config manager is not available or safety checks are disabled, teleport directly
+        if (configManager == null || !configManager.isSafetyCheckEnabled()) {
+            if (configManager != null) {
+                configManager.debug("Safety checks disabled, teleporting directly to: " + locationToString(location));
+            }
+            return player.teleport(location);
+        }
+        
+        // Find safe location with configured max distance
+        Location safeLoc = findSafeLocation(location, configManager.getMaxSafeDistance());
         if (safeLoc != null) {
+            configManager.debug("Safe teleport to: " + locationToString(safeLoc));
             return player.teleport(safeLoc);
         }
+        
+        configManager.debug("No safe location found near: " + locationToString(location));
         return false;
     }
 
@@ -54,26 +78,32 @@ public class SafeTeleport {
      * </ul>
      * 
      * @param location The starting location to search from
+     * @param maxDistance The maximum distance to search in blocks
      * @return A safe location or null if none found within world bounds
      */
-    private static Location findSafeLocation(Location location) {
+    private static Location findSafeLocation(Location location, int maxDistance) {
         // First, try the original location
         if (isSafeLocation(location)) {
             return location.clone();
         }
         
-        // Search upward
+        // Search upward with max distance limit
         Location tempLoc = location.clone();
-        for (int y = tempLoc.getBlockY(); y <= MAX_WORLD_HEIGHT; y++) {
+        int originalY = tempLoc.getBlockY();
+        int maxY = Math.min(originalY + maxDistance, MAX_WORLD_HEIGHT);
+        
+        for (int y = originalY; y <= maxY; y++) {
             tempLoc.setY(y);
             if (isSafeLocation(tempLoc)) {
                 return tempLoc.clone();
             }
         }
         
-        // Search downward from original location
+        // Search downward from original location with max distance limit
         tempLoc = location.clone();
-        for (int y = tempLoc.getBlockY(); y >= -64; y--) {
+        int minY = Math.max(originalY - maxDistance, -64);
+        
+        for (int y = originalY; y >= minY; y--) {
             tempLoc.setY(y);
             if (isSafeLocation(tempLoc)) {
                 return tempLoc.clone();
@@ -81,6 +111,23 @@ public class SafeTeleport {
         }
         
         return null;
+    }
+    
+    /**
+     * Converts a location to a readable string format.
+     * 
+     * @param location The location to convert
+     * @return String representation of the location
+     */
+    private static String locationToString(Location location) {
+        if (location == null || location.getWorld() == null) {
+            return "null";
+        }
+        return String.format("%s: %.1f, %.1f, %.1f", 
+                           location.getWorld().getName(),
+                           location.getX(),
+                           location.getY(),
+                           location.getZ());
     }
     
     /**
