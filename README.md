@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
 [![Minecraft](https://img.shields.io/badge/minecraft-1.21.8-green.svg)](https://www.minecraft.net/)
 [![Java](https://img.shields.io/badge/java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
-[![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 
 A comprehensive Minecraft plugin providing teleportation commands including homes, warps, and back functionality for Paper/Spigot servers.
 
