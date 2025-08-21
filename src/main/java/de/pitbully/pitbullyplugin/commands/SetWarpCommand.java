@@ -1,7 +1,7 @@
 package de.pitbully.pitbullyplugin.commands;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,13 +50,13 @@ public class SetWarpCommand implements CommandExecutor {
     }
     
     String warp = args[0];
-    if (Locations.checkWarpLocation(warp)) {
+    if (LocationManager.checkWarpLocation(warp)) {
       player.sendMessage("§cDer Warp " + warp + " existiert bereits!");
       player.sendMessage("§eVerwende /delwarp " + warp + " um ihn zu löschen und neu zu setzen.");
       return true;
     }
     
-    Locations.updateWarpLocation(warp, player.getLocation());
+    LocationManager.updateWarpLocation(warp, player.getLocation());
     player.sendMessage("§aDer Warp " + warp + " wurde erfolgreich gesetzt! :)");
     
     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();

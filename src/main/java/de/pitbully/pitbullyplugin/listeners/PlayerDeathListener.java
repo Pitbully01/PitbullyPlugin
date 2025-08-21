@@ -1,6 +1,6 @@
 package de.pitbully.pitbullyplugin.listeners;
 
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,7 +36,7 @@ public class PlayerDeathListener implements Listener {
         Player player = event.getEntity();
         
         // Save death location for /back command
-        Locations.updateLastDeathLocations(player.getUniqueId(), player.getLocation());
+        LocationManager.updateLastDeathLocations(player.getUniqueId(), player.getLocation());
         
         // Handle experience keeping if player has permission
         if (player.hasPermission("pitbullyplugin.keepxp")) {

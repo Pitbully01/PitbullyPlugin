@@ -1,7 +1,7 @@
 package de.pitbully.pitbullyplugin.commands;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -49,7 +49,7 @@ public class SetHomeCommand implements CommandExecutor {
       return true;
     }
     
-    Locations.updateHomeLocation(player.getUniqueId(), player.getLocation());
+    LocationManager.updateHomeLocation(player.getUniqueId(), player.getLocation());
     player.sendMessage("§aHome erfolgreich gesetzt! :)");
     
     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();

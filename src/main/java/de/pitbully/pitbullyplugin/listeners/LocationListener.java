@@ -1,6 +1,6 @@
 package de.pitbully.pitbullyplugin.listeners;
 
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -42,7 +42,7 @@ public class LocationListener implements Listener {
             case PLUGIN:
             case SPECTATE:
                 // Save the location before teleportation for /back command
-                Locations.updateLastTeleportLocations(
+                LocationManager.updateLastTeleportLocations(
                     event.getPlayer().getUniqueId(), 
                     event.getFrom()
                 );

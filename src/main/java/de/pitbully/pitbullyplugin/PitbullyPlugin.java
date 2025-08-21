@@ -13,7 +13,9 @@ import de.pitbully.pitbullyplugin.commands.WarpCommand;
 import de.pitbully.pitbullyplugin.commands.WorkbenchCommand;
 import de.pitbully.pitbullyplugin.listeners.LocationListener;
 import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.FileLocationStorage;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
+import de.pitbully.pitbullyplugin.storage.LocationStorage;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,6 +57,9 @@ public final class PitbullyPlugin extends JavaPlugin {
     /** The loaded configuration */
     private FileConfiguration config;
     
+    /** The location storage implementation */
+    private LocationStorage locationStorage;
+    
     /**
      * Called when the plugin is enabled.
      * Initializes all plugin components and loads configuration.
@@ -64,6 +69,7 @@ public final class PitbullyPlugin extends JavaPlugin {
         instance = this;
         
         initConfig();
+        initLocationStorage();
         registerCommands();
         registerEvents();
         loadConfig();
@@ -99,6 +105,48 @@ public final class PitbullyPlugin extends JavaPlugin {
         if (this.config == null) {
             this.configFile = new File(getDataFolder(), "config.yml");
             this.config = YamlConfiguration.loadConfiguration(this.configFile);
+        }
+    }
+    
+    /**
+     * Initialize the location storage system.
+     * Creates the storage implementation and initializes the LocationManager.
+     * Also handles migration from old config.yml format if needed.
+     */
+    private void initLocationStorage() {
+        // Check if we need to migrate from the old config format
+        this.locationStorage = new FileLocationStorage(getDataFolder(), getLogger(), this.config);
+        LocationManager.initialize(this.locationStorage);
+        
+        // Clean up old location data from config.yml after migration
+        cleanupOldLocationData();
+        
+        getLogger().info("Location storage initialized with separate locations.yml file.");
+    }
+    
+    /**
+     * Removes old location data from config.yml after successful migration.
+     * This keeps the config.yml clean for actual plugin configuration.
+     */
+    private void cleanupOldLocationData() {
+        boolean needsSave = false;
+        
+        // Remove old location sections if they exist
+        for (String section : new String[]{"lastDeathLocations", "lastTeleportLocations", 
+                                          "lastLocations", "homeLocations", "warpLocations", "worldSpawnLocation"}) {
+            if (this.config.contains(section)) {
+                this.config.set(section, null);
+                needsSave = true;
+            }
+        }
+        
+        if (needsSave) {
+            try {
+                this.config.save(this.configFile);
+                getLogger().info("Cleaned up old location data from config.yml");
+            } catch (Exception e) {
+                getLogger().warning("Could not clean up old location data from config.yml: " + e.getMessage());
+            }
         }
     }
     
@@ -183,7 +231,7 @@ public final class PitbullyPlugin extends JavaPlugin {
         }
         
         try {
-            Locations.loadFromConfig(this.config);
+            LocationManager.loadFromConfig();
             getLogger().info("Configuration loaded successfully.");
         } catch (Exception e) {
             getLogger().severe("Error loading configuration: " + e.getMessage());
@@ -214,7 +262,7 @@ public final class PitbullyPlugin extends JavaPlugin {
             getDataFolder().mkdirs();
         }
         
-        Locations.saveToConfig(this.config);
+        LocationManager.saveToConfig();
         
         try {
             this.config.save(this.configFile);

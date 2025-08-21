@@ -1,6 +1,6 @@
 package de.pitbully.pitbullyplugin.commands;
 
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import de.pitbully.pitbullyplugin.utils.SafeTeleport;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -39,13 +39,13 @@ public class HomeCommand implements CommandExecutor {
             return true;
         }
         
-        if (!Locations.checkHomeLocation(player.getUniqueId())) {
+        if (!LocationManager.checkHomeLocation(player.getUniqueId())) {
             player.sendMessage("§cKein Home gesetzt!");
             player.sendMessage("§eVerwende /sethome um dein Home zu setzen.");
             return true;
         }
         
-        Location homeLocation = Locations.getHomeLocation(player.getUniqueId());
+        Location homeLocation = LocationManager.getHomeLocation(player.getUniqueId());
         if (homeLocation == null) {
             player.sendMessage("§cKein Home gesetzt!");
             player.sendMessage("§eVerwende /sethome um dein Home zu setzen.");

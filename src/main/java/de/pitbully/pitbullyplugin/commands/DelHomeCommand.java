@@ -1,7 +1,7 @@
 package de.pitbully.pitbullyplugin.commands;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -49,13 +49,13 @@ public class DelHomeCommand implements CommandExecutor {
       return true;
     }
     
-    if (!Locations.checkHomeLocation(player.getUniqueId())) {
+    if (!LocationManager.checkHomeLocation(player.getUniqueId())) {
       player.sendMessage("§cKein Home gesetzt!");
       player.sendMessage("§eVerwende /sethome um ein Home zu setzen.");
       return true;
     }
     
-    Locations.deleteHomeLocation(player.getUniqueId());
+    LocationManager.deleteHomeLocation(player.getUniqueId());
     player.sendMessage("§aDein Home wurde erfolgreich gelöscht!");
     
     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();

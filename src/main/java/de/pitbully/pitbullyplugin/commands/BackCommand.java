@@ -1,6 +1,6 @@
 package de.pitbully.pitbullyplugin.commands;
 
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import de.pitbully.pitbullyplugin.utils.SafeTeleport;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -57,13 +57,13 @@ public class BackCommand implements CommandExecutor {
             return true;
         }
         
-        if (!Locations.checkLastLocation(player.getUniqueId())) {
+        if (!LocationManager.checkLastLocation(player.getUniqueId())) {
             player.sendMessage("§cEs gibt keinen Weg zurück!");
             player.sendMessage("§eTeleportiere dich oder stirb, um einen Rückweg zu haben.");
             return true;
         }
         
-        Location lastLocation = Locations.getLastLocation(player.getUniqueId());
+        Location lastLocation = LocationManager.getLastLocation(player.getUniqueId());
         if (lastLocation == null) {
             player.sendMessage("§cEs gibt keinen Weg zurück!");
             player.sendMessage("§eTeleportiere dich oder stirb, um einen Rückweg zu haben.");

@@ -1,7 +1,7 @@
 package de.pitbully.pitbullyplugin.commands;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,7 +50,7 @@ public class SetWorldSpawnCommand implements CommandExecutor {
       return true;
     }
     
-    Locations.updateWorldSpawnLocation(player.getLocation());
+    LocationManager.updateWorldSpawnLocation(player.getLocation());
     player.sendMessage("§aWorldSpawn wurde erfolgreich auf deine aktuelle Position gesetzt!");
     
     this.plugin = (JavaPlugin)PitbullyPlugin.getInstance();

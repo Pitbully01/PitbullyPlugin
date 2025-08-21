@@ -1,6 +1,6 @@
 package de.pitbully.pitbullyplugin.commands;
 
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import de.pitbully.pitbullyplugin.utils.SafeTeleport;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -48,8 +48,8 @@ public class WarpCommand implements CommandExecutor {
     }
     
     String warp = args[0];
-    if (Locations.checkWarpLocation(warp)) {
-      if (SafeTeleport.teleport(player, Locations.getWarpLocation(warp))) {
+    if (LocationManager.checkWarpLocation(warp)) {
+      if (SafeTeleport.teleport(player, LocationManager.getWarpLocation(warp))) {
         player.sendMessage("§aWoosch, du wurdest zu " + warp + " teleportiert! :)");
       } else {
         player.sendMessage("§cEs gab ein Problem beim Teleportieren. Versuche es erneut!");

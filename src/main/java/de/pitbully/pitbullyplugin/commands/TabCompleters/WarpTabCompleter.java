@@ -1,6 +1,6 @@
 package de.pitbully.pitbullyplugin.commands.TabCompleters;
 
-import de.pitbully.pitbullyplugin.utils.Locations;
+import de.pitbully.pitbullyplugin.storage.LocationManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +57,7 @@ public class WarpTabCompleter implements TabCompleter {
         }
         
         String input = args[0].toLowerCase();
-        return Locations.getWarpHashMap()
+        return LocationManager.getWarpHashMap()
                        .keySet()
                        .stream()
                        .filter(warpName -> warpName.toLowerCase().startsWith(input))
