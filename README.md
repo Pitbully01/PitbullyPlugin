@@ -2,7 +2,15 @@
 
 [![Version](https://img.shields.io/badge/version-1.5.2-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
 [![Minecraft](https://img.shields.io/badge/minecraft-1.21.8-green.svg)](https://www.minecraft.net/)
-[![Java](https://img.shields.io/badge/java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
+[![Java](https://img.shields.io/3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.2.jar`
+
+### Development Requirements
+- Java 21 JDK
+- Maven 3.6+
+- Paper API 1.21.3
+
+### Database Development
+For database feature development, see [Database Setup Guide](DATABASE_SETUP.md) for driver installation.java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 
 A comprehensive Minecraft plugin providing teleportation commands including homes, warps, and back functionality for Paper/Spigot servers.
@@ -48,13 +56,15 @@ A comprehensive Minecraft plugin providing teleportation commands including home
 - **Automatic Migration**: Seamless migration from `locations.yml` to database
 - **Zero Downtime**: Switch storage types without losing data
 - **Admin Choice**: Configure your preferred database in `config.yml`
+- **Lightweight Plugin**: Database drivers installed separately for optimal performance
 
 ## 🚀 Installation
 
 1. **Download** the latest release from [GitHub Releases](https://github.com/Pitbully01/PitbullyPlugin/releases)
 2. **Place** the JAR file in your server's `plugins/` directory
-3. **Restart** your server
-4. **Configure** permissions as needed
+3. **Database Setup** (optional): See [Database Setup Guide](DATABASE_SETUP.md) for database storage
+4. **Restart** your server
+5. **Configure** permissions as needed
 
 ## 📋 Requirements
 
@@ -217,6 +227,25 @@ lastTeleportLocations: {}
 lastLocations: {}
 ```
 
+**Note:** When database storage is enabled, this file is replaced by database tables.
+
+#### Database Storage (Optional)
+For high-performance servers, you can switch to database storage:
+
+```yaml
+database:
+  storage-type: database        # Switch from 'file' to 'database'
+  connection:
+    type: mysql                 # mysql, mariadb, postgresql, sqlite
+    host: localhost
+    port: 3306
+    database: pitbully_plugin
+    username: your_username
+    password: your_password
+```
+
+See [Database Setup Guide](DATABASE_SETUP.md) for detailed instructions.
+
 #### Automatic Backup System
 - Location data is automatically backed up (if enabled)
 - Backups are stored in `/plugins/PitbullyPlugin/backups/`
@@ -224,8 +253,10 @@ lastLocations: {}
 
 ### Automatic Migration
 - **Existing Servers**: When upgrading from v1.5.0 or earlier, location data is automatically migrated from `config.yml` to `locations.yml`
+- **Database Migration**: When switching to database storage, data is automatically migrated from `locations.yml` to database
 - **Clean Separation**: After migration, `config.yml` is cleaned and ready for actual plugin configuration
 - **Zero Downtime**: Migration happens seamlessly during plugin startup
+- **Backup Creation**: Original files are automatically backed up before migration
 
 ## 🛡️ Safety Features
 
