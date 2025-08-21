@@ -1,7 +1,11 @@
 package de.pitbully.pitbullyplugin.storage;
 
+import de.pitbully.pitbullyplugin.utils.ConfigManager;
+
+import java.io.File;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 import org.bukkit.Location;
 
 /**
@@ -27,6 +31,102 @@ public class LocationManager {
      */
     public static void initialize(LocationStorage locationStorage) {
         storage = locationStorage;
+    }
+    
+    /**
+     * Initializes the LocationManager with appropriate storage based on configuration.
+     * This method handles automatic migration if switching from file to database storage.
+     * 
+     * @param configManager The configuration manager
+     * @param dataFolder The plugin data folder
+     * @param logger Logger for messages
+     */
+    public static void initializeWithConfig(ConfigManager configManager, File dataFolder, Logger logger) {
+        if (configManager.isDatabaseStorageEnabled()) {
+            // Initialize database storage
+            DatabaseConfig dbConfig = configManager.getDatabaseConfig();
+            if (dbConfig == null) {
+                logger.severe("Database storage is enabled but configuration is invalid! Falling back to file storage.");
+                initializeFileStorage(dataFolder, logger, null);
+                return;
+            }
+            
+            try {
+                DatabaseLocationStorage dbStorage = new DatabaseLocationStorage(dbConfig, logger);
+                
+                // Check if migration is needed
+                File locationsFile = new File(dataFolder, "locations.yml");
+                if (locationsFile.exists() && locationsFile.length() > 0) {
+                    logger.info("Found existing locations.yml file. Starting migration to database...");
+                    
+                    // Load file storage temporarily for migration
+                    FileLocationStorage fileStorage = new FileLocationStorage(dataFolder, logger);
+                    fileStorage.loadAll();
+                    
+                    // Migrate data to database
+                    dbStorage.migrateFromFileStorage(fileStorage);
+                    
+                    // Create backup of old file and remove it
+                    createMigrationBackup(locationsFile, logger);
+                    
+                    fileStorage.close();
+                    logger.info("Migration completed successfully! locations.yml has been backed up and cleared.");
+                }
+                
+                storage = dbStorage;
+                logger.info("Database storage initialized successfully.");
+                
+            } catch (Exception e) {
+                logger.severe("Failed to initialize database storage: " + e.getMessage());
+                logger.severe("Falling back to file storage...");
+                e.printStackTrace();
+                initializeFileStorage(dataFolder, logger, null);
+            }
+            
+        } else {
+            // Initialize file storage
+            initializeFileStorage(dataFolder, logger, null);
+        }
+    }
+    
+    /**
+     * Initializes file storage with optional migration from old config.
+     */
+    private static void initializeFileStorage(File dataFolder, Logger logger, org.bukkit.configuration.file.FileConfiguration oldConfig) {
+        storage = new FileLocationStorage(dataFolder, logger, oldConfig);
+        logger.info("File storage initialized successfully.");
+    }
+    
+    /**
+     * Creates a backup of the locations.yml file before migration.
+     */
+    private static void createMigrationBackup(File locationsFile, Logger logger) {
+        try {
+            File backupDir = new File(locationsFile.getParent(), "migration-backups");
+            if (!backupDir.exists()) {
+                backupDir.mkdirs();
+            }
+            
+            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+            String timestamp = dateFormat.format(new java.util.Date());
+            String backupFileName = "locations_pre-migration_" + timestamp + ".yml.bak";
+            File backupFile = new File(backupDir, backupFileName);
+            
+            java.nio.file.Files.copy(locationsFile.toPath(), backupFile.toPath(), 
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            // Clear the original file content but keep the file for future use
+            try (java.io.FileWriter writer = new java.io.FileWriter(locationsFile, false)) {
+                writer.write("# This file has been migrated to database storage.\n");
+                writer.write("# A backup of the original data has been created in migration-backups/\n");
+                writer.write("# Database storage is now active for this plugin.\n");
+            }
+            
+            logger.info("Migration backup created: " + backupFile.getName());
+            
+        } catch (Exception e) {
+            logger.warning("Failed to create migration backup: " + e.getMessage());
+        }
     }
     
     /**

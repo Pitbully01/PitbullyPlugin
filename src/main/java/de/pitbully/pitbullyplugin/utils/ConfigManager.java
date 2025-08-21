@@ -1,6 +1,7 @@
 package de.pitbully.pitbullyplugin.utils;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
+import de.pitbully.pitbullyplugin.storage.DatabaseConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -31,6 +32,20 @@ public class ConfigManager {
     private static final boolean DEFAULT_DEBUG_MODE = false;
     private static final boolean DEFAULT_SAFETY_CHECK = true;
     private static final int DEFAULT_MAX_SAFE_DISTANCE = 10;
+    
+    // Database default values
+    private static final String DEFAULT_STORAGE_TYPE = "file";
+    private static final String DEFAULT_DATABASE_TYPE = "mysql";
+    private static final String DEFAULT_DATABASE_HOST = "localhost";
+    private static final int DEFAULT_DATABASE_PORT = 3306;
+    private static final String DEFAULT_DATABASE_NAME = "pitbully_plugin";
+    private static final String DEFAULT_DATABASE_USERNAME = "username";
+    private static final String DEFAULT_DATABASE_PASSWORD = "password";
+    private static final int DEFAULT_MAX_CONNECTIONS = 10;
+    private static final long DEFAULT_CONNECTION_TIMEOUT = 30000;
+    private static final long DEFAULT_MAX_LIFETIME = 1800000;
+    private static final boolean DEFAULT_SSL_ENABLED = false;
+    private static final boolean DEFAULT_SSL_VERIFY_CERTIFICATE = true;
     
     /**
      * Creates a new ConfigManager instance.
@@ -73,7 +88,9 @@ public class ConfigManager {
         return !config.contains("settings.create-backups") ||
                !config.contains("settings.debug-mode") ||
                !config.contains("settings.teleport.safety-check") ||
-               !config.contains("settings.teleport.max-safe-distance");
+               !config.contains("settings.teleport.max-safe-distance") ||
+               !config.contains("database.storage-type") ||
+               !config.contains("database.connection.type");
     }
     
     /**
@@ -94,6 +111,55 @@ public class ConfigManager {
         
         if (!config.contains("settings.teleport.max-safe-distance")) {
             config.set("settings.teleport.max-safe-distance", DEFAULT_MAX_SAFE_DISTANCE);
+        }
+        
+        // Database defaults
+        if (!config.contains("database.storage-type")) {
+            config.set("database.storage-type", DEFAULT_STORAGE_TYPE);
+        }
+        
+        if (!config.contains("database.connection.type")) {
+            config.set("database.connection.type", DEFAULT_DATABASE_TYPE);
+        }
+        
+        if (!config.contains("database.connection.host")) {
+            config.set("database.connection.host", DEFAULT_DATABASE_HOST);
+        }
+        
+        if (!config.contains("database.connection.port")) {
+            config.set("database.connection.port", DEFAULT_DATABASE_PORT);
+        }
+        
+        if (!config.contains("database.connection.database")) {
+            config.set("database.connection.database", DEFAULT_DATABASE_NAME);
+        }
+        
+        if (!config.contains("database.connection.username")) {
+            config.set("database.connection.username", DEFAULT_DATABASE_USERNAME);
+        }
+        
+        if (!config.contains("database.connection.password")) {
+            config.set("database.connection.password", DEFAULT_DATABASE_PASSWORD);
+        }
+        
+        if (!config.contains("database.connection.pool.max-connections")) {
+            config.set("database.connection.pool.max-connections", DEFAULT_MAX_CONNECTIONS);
+        }
+        
+        if (!config.contains("database.connection.pool.connection-timeout")) {
+            config.set("database.connection.pool.connection-timeout", DEFAULT_CONNECTION_TIMEOUT);
+        }
+        
+        if (!config.contains("database.connection.pool.max-lifetime")) {
+            config.set("database.connection.pool.max-lifetime", DEFAULT_MAX_LIFETIME);
+        }
+        
+        if (!config.contains("database.connection.ssl.enabled")) {
+            config.set("database.connection.ssl.enabled", DEFAULT_SSL_ENABLED);
+        }
+        
+        if (!config.contains("database.connection.ssl.verify-server-certificate")) {
+            config.set("database.connection.ssl.verify-server-certificate", DEFAULT_SSL_VERIFY_CERTIFICATE);
         }
     }
     
@@ -149,5 +215,60 @@ public class ConfigManager {
      */
     public void reload() {
         loadConfig();
+    }
+    
+    /**
+     * Get the storage type (file or database).
+     * 
+     * @return the storage type
+     */
+    public String getStorageType() {
+        return config.getString("database.storage-type", DEFAULT_STORAGE_TYPE);
+    }
+    
+    /**
+     * Check if database storage is enabled.
+     * 
+     * @return true if database storage is enabled, false otherwise
+     */
+    public boolean isDatabaseStorageEnabled() {
+        return "database".equalsIgnoreCase(getStorageType());
+    }
+    
+    /**
+     * Create a DatabaseConfig object from the configuration.
+     * 
+     * @return DatabaseConfig object, or null if database storage is not enabled
+     */
+    public DatabaseConfig getDatabaseConfig() {
+        if (!isDatabaseStorageEnabled()) {
+            return null;
+        }
+        
+        try {
+            DatabaseConfig.DatabaseType type = DatabaseConfig.DatabaseType.fromString(
+                config.getString("database.connection.type", DEFAULT_DATABASE_TYPE)
+            );
+            
+            String host = config.getString("database.connection.host", DEFAULT_DATABASE_HOST);
+            int port = config.getInt("database.connection.port", DEFAULT_DATABASE_PORT);
+            String database = config.getString("database.connection.database", DEFAULT_DATABASE_NAME);
+            String username = config.getString("database.connection.username", DEFAULT_DATABASE_USERNAME);
+            String password = config.getString("database.connection.password", DEFAULT_DATABASE_PASSWORD);
+            
+            int maxConnections = config.getInt("database.connection.pool.max-connections", DEFAULT_MAX_CONNECTIONS);
+            long connectionTimeout = config.getLong("database.connection.pool.connection-timeout", DEFAULT_CONNECTION_TIMEOUT);
+            long maxLifetime = config.getLong("database.connection.pool.max-lifetime", DEFAULT_MAX_LIFETIME);
+            
+            boolean sslEnabled = config.getBoolean("database.connection.ssl.enabled", DEFAULT_SSL_ENABLED);
+            boolean sslVerifyServerCertificate = config.getBoolean("database.connection.ssl.verify-server-certificate", DEFAULT_SSL_VERIFY_CERTIFICATE);
+            
+            return new DatabaseConfig(type, host, port, database, username, password,
+                maxConnections, connectionTimeout, maxLifetime, sslEnabled, sslVerifyServerCertificate);
+                
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().severe("Invalid database type in configuration: " + e.getMessage());
+            return null;
+        }
     }
 }

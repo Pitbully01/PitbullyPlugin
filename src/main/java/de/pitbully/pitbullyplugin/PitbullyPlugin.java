@@ -75,11 +75,11 @@ public final class PitbullyPlugin extends JavaPlugin {
         // Step 1: Initialize basic config file structure
         initConfig();
         
-        // Step 2: Initialize location storage (this handles migration from old config)
-        initLocationStorage();
-        
-        // Step 3: Now initialize config manager (after migration is complete)
+        // Step 2: Initialize config manager first (needed for storage type detection)
         initConfigManager();
+        
+        // Step 3: Initialize location storage with automatic migration support
+        initLocationStorage();
         
         // Step 4: Register commands and events
         registerCommands();
@@ -93,10 +93,15 @@ public final class PitbullyPlugin extends JavaPlugin {
     
     /**
      * Called when the plugin is disabled.
-     * Saves configuration before shutdown.
+     * Saves configuration and closes storage connections before shutdown.
      */
     @Override
     public void onDisable() {
+        // Save and close storage properly
+        if (locationStorage != null) {
+            locationStorage.close();
+        }
+        
         saveConfig();
         getLogger().info("PitbullyPlugin has been disabled!");
     }
@@ -141,18 +146,36 @@ public final class PitbullyPlugin extends JavaPlugin {
     
     /**
      * Initialize the location storage system.
-     * Creates the storage implementation and initializes the LocationManager.
-     * Also handles migration from old config.yml format if needed.
+     * Creates the appropriate storage implementation based on configuration.
+     * Handles automatic migration from file to database if needed.
      */
     private void initLocationStorage() {
-        // Check if we need to migrate from the old config format
-        this.locationStorage = new FileLocationStorage(getDataFolder(), getLogger(), this.config);
-        LocationManager.initialize(this.locationStorage);
-        
-        // Clean up old location data from config.yml after migration
-        cleanupOldLocationData();
-        
-        getLogger().info("Location storage initialized with separate locations.yml file.");
+        try {
+            // Use the new configuration-based initialization with automatic migration
+            LocationManager.initializeWithConfig(configManager, getDataFolder(), getLogger());
+            
+            // Get the initialized storage from LocationManager
+            this.locationStorage = LocationManager.getStorage();
+            
+            // Clean up old location data from config.yml after migration (if applicable)
+            cleanupOldLocationData();
+            
+            if (configManager.isDatabaseStorageEnabled()) {
+                getLogger().info("Database storage initialized successfully.");
+            } else {
+                getLogger().info("File storage initialized successfully.");
+            }
+            
+        } catch (Exception e) {
+            getLogger().severe("Failed to initialize location storage: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Fallback to file storage
+            getLogger().info("Falling back to file storage...");
+            this.locationStorage = new FileLocationStorage(getDataFolder(), getLogger(), this.config);
+            LocationManager.initialize(this.locationStorage);
+            cleanupOldLocationData();
+        }
     }
     
     /**

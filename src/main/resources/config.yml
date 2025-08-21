@@ -17,6 +17,40 @@ settings:
     # Maximum distance to search for safe location
     max-safe-distance: 10
 
+# Database Settings
+database:
+  # Storage type: 'file' (default) or 'database'
+  # - file: Uses locations.yml file storage
+  # - database: Uses SQL database storage
+  storage-type: file
+  
+  # Database connection settings (only used when storage-type is 'database')
+  connection:
+    # Database type: mysql, mariadb, postgresql, sqlite
+    # Note: MySQL is recommended for production servers
+    type: mysql
+    
+    # Database connection details
+    host: localhost
+    port: 3306
+    database: pitbully_plugin
+    username: username
+    password: password
+    
+    # Advanced connection settings
+    pool:
+      # Maximum number of connections in the pool
+      max-connections: 10
+      # Connection timeout in milliseconds
+      connection-timeout: 30000
+      # Maximum lifetime of a connection in milliseconds
+      max-lifetime: 1800000
+    
+    # SSL settings
+    ssl:
+      enabled: false
+      verify-server-certificate: true
+
 # Plugin Information & Commands
 # 🏠 Home Commands:
 #   - /home - Teleport to your home location
@@ -38,4 +72,17 @@ settings:
 #
 # 📁 Data Storage:
 #   - Plugin settings: config.yml (this file)
-#   - Location data: locations.yml (automatically created)
+#   - Location data: locations.yml OR database (see database settings below)
+#
+# 🗃️ Database Storage:
+#   When database storage is enabled, all location data (homes, warps, death locations, etc.)
+#   will be stored in your chosen database instead of locations.yml.
+#   
+#   Migration: If you switch from file to database storage, existing data in locations.yml
+#   will be automatically migrated to the database on next server start.
+#
+#   Supported databases:
+#   - MySQL (recommended for production)
+#   - MariaDB (recommended alternative to MySQL)
+#   - PostgreSQL (good for advanced setups)
+#   - SQLite (good for small servers, single-file database)

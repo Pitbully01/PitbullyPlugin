@@ -1,6 +1,6 @@
 # PitbullyPlugin
 
-[![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
+[![Version](https://img.shields.io/badge/version-1.5.2-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
 [![Minecraft](https://img.shields.io/badge/minecraft-1.21.8-green.svg)](https://www.minecraft.net/)
 [![Java](https://img.shields.io/badge/java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
@@ -35,10 +35,19 @@ A comprehensive Minecraft plugin providing teleportation commands including home
 ## 🏗️ Architecture
 
 ### Clean Storage Architecture (v1.5.1+)
-- **Separation of Concerns**: Configuration (`config.yml`) separate from location data (`locations.yml`)
-- **Interface-Based Design**: `LocationStorage` interface with `FileLocationStorage` implementation
+- **Multiple Storage Backends**: Support for both file-based and database storage
+- **Automatic Migration**: Seamless migration from file to database storage
+- **Separation of Concerns**: Configuration (`config.yml`) separate from location data
+- **Interface-Based Design**: `LocationStorage` interface with multiple implementations
 - **Backward Compatibility**: Automatic migration from old single-file format
-- **Extensible**: Easy to add new storage backends (database, etc.) in the future
+- **Extensible**: Easy to add new storage backends
+
+### Database Support (v1.5.2+)
+- **Multiple Databases**: MySQL, MariaDB, PostgreSQL, and SQLite support
+- **Connection Pooling**: HikariCP for optimal database performance
+- **Automatic Migration**: Seamless migration from `locations.yml` to database
+- **Zero Downtime**: Switch storage types without losing data
+- **Admin Choice**: Configure your preferred database in `config.yml`
 
 ## 🚀 Installation
 
@@ -96,6 +105,55 @@ pitbullyplugin.keepxp: true        # Keep experience on death
 
 ## ⚙️ Configuration
 
+### Storage Configuration
+
+PitbullyPlugin supports both file-based and database storage for location data. You can choose your preferred storage method in the configuration.
+
+#### File Storage (Default)
+The traditional YAML-based storage system using `locations.yml`:
+```yaml
+database:
+  storage-type: file  # Use file-based storage (default)
+```
+
+#### Database Storage
+Store location data in a SQL database for better performance and scalability:
+```yaml
+database:
+  storage-type: database  # Enable database storage
+  
+  connection:
+    type: mysql  # mysql, mariadb, postgresql, or sqlite
+    host: localhost
+    port: 3306
+    database: pitbully_plugin
+    username: your_username
+    password: your_password
+    
+    pool:
+      max-connections: 10
+      connection-timeout: 30000
+      max-lifetime: 1800000
+    
+    ssl:
+      enabled: false
+      verify-server-certificate: true
+```
+
+#### Supported Databases
+- **MySQL** - Recommended for production servers
+- **MariaDB** - Excellent MySQL alternative
+- **PostgreSQL** - Advanced database features
+- **SQLite** - Single-file database, perfect for smaller servers
+
+#### Automatic Migration
+When switching from file to database storage:
+1. Change `storage-type` from `file` to `database` in config.yml
+2. Configure your database connection settings
+3. Restart the server
+4. All data from `locations.yml` is automatically migrated to the database
+5. A backup of your original `locations.yml` is created in `migration-backups/`
+
 ### Plugin Configuration Files
 
 The plugin uses two separate configuration files for better organization:
@@ -116,6 +174,21 @@ settings:
     safety-check: true
     # Maximum distance to search for safe location
     max-safe-distance: 10
+
+# Database Settings  
+database:
+  # Storage type: 'file' (default) or 'database'
+  storage-type: file
+  
+  # Database connection settings (only used when storage-type is 'database')
+  connection:
+    type: mysql  # mysql, mariadb, postgresql, sqlite
+    host: localhost
+    port: 3306
+    database: pitbully_plugin
+    username: username
+    password: password
+    # ... additional connection settings
 ```
 
 #### Configuration Management
