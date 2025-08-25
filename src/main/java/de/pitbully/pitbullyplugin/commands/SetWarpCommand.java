@@ -31,6 +31,7 @@ public class SetWarpCommand implements CommandExecutor {
    * @param args The arguments passed to the command (expects warp name)
    * @return true if the command was handled successfully
    */
+  @Override
   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
     if (!(commandSender instanceof Player)) {
       commandSender.sendMessage("Dieser Befehl kann nur von Spielern ausgeführt werden!");

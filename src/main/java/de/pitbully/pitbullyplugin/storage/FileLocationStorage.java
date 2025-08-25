@@ -420,7 +420,7 @@ public class FileLocationStorage implements LocationStorage {
             }
         } catch (IOException e) {
             logger.severe("Could not save locations to " + locationsFile.getAbsolutePath() + ": " + e.getMessage());
-            e.printStackTrace();
+            logger.log(java.util.logging.Level.SEVERE, "Exception while saving locations file", e);
         }
     }
     
@@ -568,5 +568,22 @@ public class FileLocationStorage implements LocationStorage {
             worldSpawn.getWorld().setSpawnLocation(worldSpawn);
         }
     }
-    
+
+    /** Checks if a player's last death location is set. */
+    @Override
+    public boolean hasLastDeathLocation(UUID uniqueId) {
+        return deathLocations.containsKey(uniqueId);
+    }
+
+    /** Checks if a player's last teleport location is set. */
+    @Override
+    public boolean hasLastTeleportLocation(UUID uniqueId) {
+        return teleportLocations.containsKey(uniqueId);
+    }
+
+    /** Retrieves a player's last teleport location. */
+    @Override
+    public Location getLastTeleportLocation(UUID uniqueId) {
+        return teleportLocations.get(uniqueId);
+    }
 }

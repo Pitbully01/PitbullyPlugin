@@ -674,8 +674,65 @@ public class DatabaseLocationStorage implements LocationStorage {
             
         } catch (Exception e) {
             logger.severe("Failed to migrate from file storage to database: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(java.util.logging.Level.SEVERE, "Exception during file-to-database migration", e);
             throw new RuntimeException("Migration failed", e);
         }
     }
+
+    /**
+     * Checks if a player has a last death location stored.
+     *
+     * @param uniqueId The UUID of the player
+     * @return True if a last death location exists, false otherwise
+     */
+    @Override
+    public boolean hasLastDeathLocation(UUID uniqueId) {
+        String sql = "SELECT COUNT(*) FROM " + TABLE_PLAYER_LOCATIONS + " WHERE player_uuid = ? AND location_type = 'death'";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, uniqueId.toString());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            logger.severe("Failed to check last death location for player " + uniqueId + ": " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a player has a last teleport location stored.
+     *
+     * @param uniqueId The UUID of the player
+     * @return True if a last teleport location exists, false otherwise
+     */
+    @Override
+    public boolean hasLastTeleportLocation(UUID uniqueId) {
+        String sql = "SELECT COUNT(*) FROM " + TABLE_PLAYER_LOCATIONS + " WHERE player_uuid = ? AND location_type = 'teleport'";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, uniqueId.toString());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            logger.severe("Failed to check last teleport location for player " + uniqueId + ": " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves a player's last teleport location.
+     *
+     * @param uniqueId The UUID of the player
+     * @return The player's last teleport location, or null if none exists
+     */
+    @Override
+    public Location getLastTeleportLocation(UUID uniqueId) {
+        return getPlayerLocation(uniqueId, TYPE_TELEPORT);
+    }
+
+    
 }

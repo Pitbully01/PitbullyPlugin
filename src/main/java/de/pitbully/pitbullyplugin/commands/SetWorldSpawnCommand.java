@@ -32,6 +32,7 @@ public class SetWorldSpawnCommand implements CommandExecutor {
    * @param args The arguments passed to the command
    * @return true if the command was handled successfully
    */
+  @Override
   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
     if (!(commandSender instanceof Player)) {
       commandSender.sendMessage("Dieser Befehl kann nur von Spielern ausgeführt werden!");
@@ -39,9 +40,9 @@ public class SetWorldSpawnCommand implements CommandExecutor {
     }
     Player player = (Player)commandSender;
     
-    if (args.length != 0) {
-      player.sendMessage("§cFehler: Dieser Befehl benötigt keine Argumente!");
-      player.sendMessage("§eVerwendung: /setworldspawn");
+      if (args.length != 0) {
+        player.sendMessage("§cFehler: Dieser Befehl benötigt keine Argumente!");
+        player.sendMessage("§eVerwendung: /setspawn");
       return true;
     }
     

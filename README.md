@@ -1,7 +1,7 @@
 # PitbullyPlugin
 
-[![Version](https://img.shields.io/badge/version-1.5.3-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
-[![Minecraft](https://img.shields.io/badge/minecraft-1.21.8-green.svg)](https://www.minecraft.net/)
+[![Version](https://img.shields.io/badge/version-1.5.4-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
+[![Minecraft](https://img.shields.io/badge/minecraft-1.21.3-green.svg)](https://www.minecraft.net/)
 [![Java](https://img.shields.io/badge/java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 
@@ -273,7 +273,7 @@ See [Database Setup Guide](DATABASE_SETUP.md) for detailed instructions.
    mvn clean package
    ```
 
-3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.3.jar`
+3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.4.jar`
 
 ### Development Requirements
 - Java 21 JDK
@@ -321,7 +321,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [LICENSE](LICENSE) file for details.
 
 ## 🐛 Bug Reports & Feature Requests
 

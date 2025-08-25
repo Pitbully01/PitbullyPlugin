@@ -31,6 +31,7 @@ public class DelWarpCommand implements CommandExecutor {
    * @param args The arguments passed to the command (expects warp name)
    * @return true if the command was handled successfully
    */
+  @Override
   public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
     if (!(commandSender instanceof Player)) {
       commandSender.sendMessage("Dieser Befehl kann nur von Spielern ausgeführt werden!");
@@ -50,11 +51,10 @@ public class DelWarpCommand implements CommandExecutor {
     }
     
     String warp = args[0];
-    if (!LocationManager.checkWarpLocation(warp)) {
-      player.sendMessage("§cDer Warp '" + warp + "' existiert nicht!");
-      player.sendMessage("§eVerwende /warps um alle verfügbaren Warps zu sehen.");
-      return true;
-    }
+      if (!LocationManager.checkWarpLocation(warp)) {
+        player.sendMessage("§cDer Warp '" + warp + "' existiert nicht!");
+        return true;
+      }
     
     LocationManager.deleteWarpLocation(warp);
     player.sendMessage("§aDer Warp '" + warp + "' wurde erfolgreich gelöscht! :)");

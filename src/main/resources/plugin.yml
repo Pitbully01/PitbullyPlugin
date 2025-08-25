@@ -2,7 +2,7 @@ name: PitbullyPlugin
 version: '${project.version}'
 main: de.pitbully.pitbullyplugin.PitbullyPlugin
 api-version: '1.21'
-prefix: [PitbullyPlugin]
+prefix: PitbullyPlugin
 authors: [Pitbully01]
 description: A Minecraft plugin providing teleportation commands like home, warp, and back functionality
 website: https://nalumina.de
@@ -22,7 +22,7 @@ commands:
     permission: pitbullyplugin.delhome
   back:
     description: Teleport back to your previous location
-    usage: /back
+    usage: /back [death|teleport]
     permission: pitbullyplugin.back
   setwarp:
     description: Set a warp point
@@ -68,15 +68,21 @@ permissions:
   pitbullyplugin.back:
     description: Allows the player to teleport back to their previous location
     default: true
+  pitbullyplugin.back.death:
+    description: Allows the player to teleport back to their death location
+    default: true
+  pitbullyplugin.back.teleport:
+    description: Allows the player to teleport back to their last teleport location
+    default: true
   pitbullyplugin.setwarp:
     description: Allows the player to set warp points
-    default: true
+  default: op
   pitbullyplugin.warp:
     description: Allows the player to use warp points
     default: true
   pitbullyplugin.delwarp:
     description: Allows the player to delete warp points
-    default: true
+  default: op
   pitbullyplugin.enderchest:
     description: Allows the player to access their own enderchest
     default: true
@@ -88,7 +94,7 @@ permissions:
     default: true
   pitbullyplugin.setworldspawn:
     description: Allows the player to set the world spawn location
-    default: true
+  default: op
   pitbullyplugin.keepxp:
     description: Allows the player to keep experience on death
     default: true

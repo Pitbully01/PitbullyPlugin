@@ -22,9 +22,6 @@ public class SafeTeleport {
     /** Maximum world height for modern Minecraft versions (1.18+) */
     private static final int MAX_WORLD_HEIGHT = 319;
     
-    /** Default maximum distance to search for safe location */
-    private static final int DEFAULT_MAX_SAFE_DISTANCE = 10;
-    
     /**
      * Safely teleports a player to the specified location.
      * Searches for a safe spot near the target location if necessary.

@@ -241,4 +241,25 @@ public interface LocationStorage {
      * clean up connections, file handles, or other resources.
      */
     void close();
+
+    /**
+     * Checks if a player has a last known death location.
+     * @param uniqueId The UUID of the player
+     * @return true if the player has a last death location, false otherwise
+     */
+    boolean hasLastDeathLocation(UUID uniqueId);
+
+    /**
+     * Checks if a player has a last known teleport location.
+     * @param uniqueId The UUID of the player
+     * @return true if the player has a last teleport location, false otherwise
+     */
+    boolean hasLastTeleportLocation(UUID uniqueId);
+
+    /**
+     * Retrieves a player's last teleport location.
+     * @param uniqueId The UUID of the player
+     * @return The player's last teleport location, or null if none exists
+     */
+    Location getLastTeleportLocation(UUID uniqueId);
 }

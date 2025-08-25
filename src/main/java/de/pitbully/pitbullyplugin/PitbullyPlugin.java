@@ -9,6 +9,7 @@ import de.pitbully.pitbullyplugin.commands.PluginInfoCommand;
 import de.pitbully.pitbullyplugin.commands.SetHomeCommand;
 import de.pitbully.pitbullyplugin.commands.SetWarpCommand;
 import de.pitbully.pitbullyplugin.commands.SetWorldSpawnCommand;
+import de.pitbully.pitbullyplugin.commands.TabCompleters.BackTabCompleter;
 import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
 import de.pitbully.pitbullyplugin.commands.WarpCommand;
 import de.pitbully.pitbullyplugin.commands.WorkbenchCommand;
@@ -28,6 +29,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.logging.Level;
 
 /**
  * Main plugin class for PitbullyPlugin.
@@ -210,7 +212,7 @@ public final class PitbullyPlugin extends JavaPlugin {
             
         } catch (Exception e) {
             getLogger().severe("Failed to initialize location storage: " + e.getMessage());
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Exception while initializing location storage", e);
             
             // Fallback to file storage
             getLogger().info("Falling back to file storage...");
@@ -226,12 +228,13 @@ public final class PitbullyPlugin extends JavaPlugin {
      * Includes both primary commands and their aliases.
      */
     private void registerCommands() {
+        BackTabCompleter backTabCompleter = new BackTabCompleter();
         WarpTabCompleter warpTabCompleter = new WarpTabCompleter();
         
         registerCommand("home", new HomeCommand());
         registerCommand("sethome", new SetHomeCommand());
         registerCommand("delhome", new DelHomeCommand());
-        registerCommand("back", new BackCommand());
+        registerCommand("back", new BackCommand(), backTabCompleter);
         registerCommand("setwarp", new SetWarpCommand());
         registerCommand("warp", new WarpCommand(), warpTabCompleter);
         registerCommand("delwarp", new DelWarpCommand(), warpTabCompleter);
@@ -239,10 +242,6 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("workbench", new WorkbenchCommand());
         registerCommand("setspawn", new SetWorldSpawnCommand());
         registerCommand("pitbullyinfo", new PluginInfoCommand());
-        
-        // Register aliases manually to ensure they work
-        registerCommand("ec", new EnderchestCommand());
-        registerCommand("wb", new WorkbenchCommand());
     }
     
     /**
@@ -330,7 +329,7 @@ public final class PitbullyPlugin extends JavaPlugin {
             }
         } catch (Exception e) {
             getLogger().severe("Error loading configuration: " + e.getMessage());
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Exception while loading configuration", e);
         }
     }
     
@@ -384,7 +383,7 @@ public final class PitbullyPlugin extends JavaPlugin {
             }
         } catch (IOException e) {
             getLogger().severe("Could not save config to " + this.configFile + ": " + e.getMessage());
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, "Exception while saving configuration", e);
         }
     }
     

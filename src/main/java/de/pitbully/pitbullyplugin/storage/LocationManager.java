@@ -79,7 +79,7 @@ public class LocationManager {
             } catch (Exception e) {
                 logger.severe("Failed to initialize database storage: " + e.getMessage());
                 logger.severe("Falling back to file storage...");
-                e.printStackTrace();
+                logger.log(java.util.logging.Level.SEVERE, "Exception during database initialization", e);
                 initializeFileStorage(dataFolder, logger);
             }
             
@@ -361,5 +361,26 @@ public class LocationManager {
      */
     public static void saveToConfig() {
         getStorage().saveAll();
+    }
+
+    /**
+     *  Checks if a player's last death location is set.
+     */
+    public static boolean checkLastDeathLocation(UUID uniqueId) {
+        return getStorage().hasLastDeathLocation(uniqueId);
+    }
+
+    /**
+     *  Checks if a player's last teleport location is set.
+     */
+    public static boolean checkLastTeleportLocation(UUID uniqueId) {
+        return getStorage().hasLastTeleportLocation(uniqueId);
+    }
+
+    /**
+     *  Retrieves a player's last teleport location.
+     */
+    public static Location getLastTeleportLocation(UUID uniqueId) {
+        return getStorage().getLastTeleportLocation(uniqueId);
     }
 }
