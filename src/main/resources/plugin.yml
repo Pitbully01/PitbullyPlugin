@@ -61,7 +61,7 @@ commands:
   tpahere:
     description: Ask a player to teleport to you
     usage: /tpahere <player>
-  permission: pitbullyplugin.tpahere
+    permission: pitbullyplugin.tpahere
   tpaccept:
     description: Accept the pending teleport request
     usage: /tpaccept
