@@ -58,7 +58,6 @@ commands:
     description: Send a teleport request to another player
     usage: /tpa <player>
     permission: pitbullyplugin.tpa
-  # Ask another player to teleport to you
   tpahere:
     description: Ask a player to teleport to you
     usage: /tpahere <player>
