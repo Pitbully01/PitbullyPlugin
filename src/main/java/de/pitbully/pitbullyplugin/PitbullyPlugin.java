@@ -13,8 +13,13 @@ import de.pitbully.pitbullyplugin.commands.TabCompleters.BackTabCompleter;
 import de.pitbully.pitbullyplugin.commands.TabCompleters.WarpTabCompleter;
 import de.pitbully.pitbullyplugin.commands.WarpCommand;
 import de.pitbully.pitbullyplugin.commands.WorkbenchCommand;
+import de.pitbully.pitbullyplugin.commands.TpAcceptCommand;
+import de.pitbully.pitbullyplugin.commands.TpDenyCommand;
+import de.pitbully.pitbullyplugin.commands.TpaCommand;
+import de.pitbully.pitbullyplugin.commands.TpaHereCommand;
 import de.pitbully.pitbullyplugin.listeners.LocationListener;
 import de.pitbully.pitbullyplugin.listeners.PlayerDeathListener;
+import de.pitbully.pitbullyplugin.listeners.PlayerQuitCleanupListener;
 import de.pitbully.pitbullyplugin.storage.FileLocationStorage;
 import de.pitbully.pitbullyplugin.storage.LocationManager;
 import de.pitbully.pitbullyplugin.storage.LocationStorage;
@@ -48,7 +53,7 @@ import java.util.logging.Level;
  * back command, and utility commands like enderchest and workbench access.
  * 
  * @author Pitbully01
- * @version 1.5.3
+ * @version 1.6.0
  * @since 1.0.0
  */
 public final class PitbullyPlugin extends JavaPlugin {
@@ -223,9 +228,8 @@ public final class PitbullyPlugin extends JavaPlugin {
 
     
     /**
-     * Register all plugin commands.
-     * Sets up command executors and tab completers for all plugin commands.
-     * Includes both primary commands and their aliases.
+     * Registers all plugin commands with their executors and optional tab completers.
+     * Keep this list in sync with plugin.yml to avoid NPEs on registration.
      */
     private void registerCommands() {
         BackTabCompleter backTabCompleter = new BackTabCompleter();
@@ -242,15 +246,19 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("workbench", new WorkbenchCommand());
         registerCommand("setspawn", new SetWorldSpawnCommand());
         registerCommand("pitbullyinfo", new PluginInfoCommand());
+        registerCommand("tpaccept", new TpAcceptCommand());
+        registerCommand("tpdeny", new TpDenyCommand());
+        registerCommand("tpa", new TpaCommand());
+        registerCommand("tpahere", new TpaHereCommand());
     }
     
     /**
-     * Register all event listeners.
-     * Sets up listeners for location tracking and player death events.
+     * Registers all event listeners used by the plugin.
      */
     private void registerEvents() {
         getServer().getPluginManager().registerEvents(new LocationListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
+    getServer().getPluginManager().registerEvents(new PlayerQuitCleanupListener(), this);
     }
     
     /**

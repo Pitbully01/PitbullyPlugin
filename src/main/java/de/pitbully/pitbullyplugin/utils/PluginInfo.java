@@ -20,7 +20,7 @@ public class PluginInfo {
     private static Logger logger;
     
     // Default fallback values
-    private static final String DEFAULT_VERSION = "1.5.4-SNAPSHOT";
+    private static final String DEFAULT_VERSION = "1.6.0-SNAPSHOT";
     private static final String DEFAULT_NAME = "PitbullyPlugin";
     private static final String DEFAULT_DESCRIPTION = "A Minecraft plugin providing teleportation commands";
     

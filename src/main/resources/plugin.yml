@@ -54,6 +54,23 @@ commands:
     description: Display detailed plugin information and version details
     usage: /pitbullyinfo
     permission: pitbullyplugin.info
+  tpa:
+    description: Send a teleport request to another player
+    usage: /tpa <player>
+    permission: pitbullyplugin.tpa
+  # Ask another player to teleport to you
+  tpahere:
+    description: Ask a player to teleport to you
+    usage: /tpahere <player>
+  permission: pitbullyplugin.tpahere
+  tpaccept:
+    description: Accept the pending teleport request
+    usage: /tpaccept
+    permission: pitbullyplugin.tpaccept
+  tpdeny:
+    description: Deny the pending teleport request
+    usage: /tpdeny
+    permission: pitbullyplugin.tpdeny
 
 permissions:
   pitbullyplugin.home:
@@ -76,13 +93,13 @@ permissions:
     default: true
   pitbullyplugin.setwarp:
     description: Allows the player to set warp points
-  default: op
+    default: op
   pitbullyplugin.warp:
     description: Allows the player to use warp points
     default: true
   pitbullyplugin.delwarp:
     description: Allows the player to delete warp points
-  default: op
+    default: op
   pitbullyplugin.enderchest:
     description: Allows the player to access their own enderchest
     default: true
@@ -94,10 +111,22 @@ permissions:
     default: true
   pitbullyplugin.setworldspawn:
     description: Allows the player to set the world spawn location
-  default: op
+    default: op
   pitbullyplugin.keepxp:
     description: Allows the player to keep experience on death
     default: true
   pitbullyplugin.info:
     description: Allows the player to view detailed plugin information
     default: op
+  pitbullyplugin.tpa:
+    description: Allows the player to send teleport requests
+    default: true
+  pitbullyplugin.tpaccept:
+    description: Allows the player to accept teleport requests
+    default: true
+  pitbullyplugin.tpdeny:
+    description: Allows the player to deny teleport requests
+    default: true
+  pitbullyplugin.tpahere:
+    description: Allows the player to ask others to teleport to them
+    default: true

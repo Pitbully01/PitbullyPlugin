@@ -66,11 +66,13 @@ public class LocationManager {
                     // Migrate data to database
                     dbStorage.migrateFromFileStorage(fileStorage);
                     
-                    // Create backup of old file and remove it
-                    createMigrationBackup(locationsFile, logger);
-                    
+                    // Remove old file contents after migration
+                    try (java.io.FileWriter writer = new java.io.FileWriter(locationsFile, false)) {
+                        writer.write("# This file has been migrated to database storage.\n");
+                        writer.write("# Database storage is now active for this plugin.\n");
+                    }
                     fileStorage.close();
-                    logger.info("Migration completed successfully! locations.yml has been backed up and cleared.");
+                    logger.info("Migration completed successfully! locations.yml has been cleared after migration.");
                 }
                 
                 storage = dbStorage;
@@ -97,37 +99,7 @@ public class LocationManager {
         logger.info("File storage initialized successfully.");
     }
     
-    /**
-     * Creates a backup of the locations.yml file before migration.
-     */
-    private static void createMigrationBackup(File locationsFile, Logger logger) {
-        try {
-            File backupDir = new File(locationsFile.getParent(), "migration-backups");
-            if (!backupDir.exists()) {
-                backupDir.mkdirs();
-            }
-            
-            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-            String timestamp = dateFormat.format(new java.util.Date());
-            String backupFileName = "locations_pre-migration_" + timestamp + ".yml.bak";
-            File backupFile = new File(backupDir, backupFileName);
-            
-            java.nio.file.Files.copy(locationsFile.toPath(), backupFile.toPath(), 
-                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            
-            // Clear the original file content but keep the file for future use
-            try (java.io.FileWriter writer = new java.io.FileWriter(locationsFile, false)) {
-                writer.write("# This file has been migrated to database storage.\n");
-                writer.write("# A backup of the original data has been created in migration-backups/\n");
-                writer.write("# Database storage is now active for this plugin.\n");
-            }
-            
-            logger.info("Migration backup created: " + backupFile.getName());
-            
-        } catch (Exception e) {
-            logger.warning("Failed to create migration backup: " + e.getMessage());
-        }
-    }
+    // Backup functionality removed by request
     
     /**
      * Gets the current storage instance.

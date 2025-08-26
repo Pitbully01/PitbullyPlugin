@@ -1,68 +1,76 @@
 # PitbullyPlugin
 
-[![Version](https://img.shields.io/badge/version-1.5.4-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
+[![Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/Pitbully01/PitbullyPlugin/releases)
 [![Minecraft](https://img.shields.io/badge/minecraft-1.21.3-green.svg)](https://www.minecraft.net/)
 [![Java](https://img.shields.io/badge/java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 
-A comprehensive Minecraft plugin providing teleportation commands including homes, warps, and back functionality for Paper/Spigot servers.
+A comprehensive Minecraft plugin providing teleportation commands including homes, warps, back, and player-to-player teleport requests for Paper/Spigot servers.
 
 ## ✨ Features
 
 ### 🏠 Home System
-- **Set Home**: `/sethome` - Set your personal home location
-- **Go Home**: `/home` - Teleport to your home location
-- **Delete Home**: `/delhome` - Remove your home location
+- Set Home: `/sethome` — Set your personal home location
+- Go Home: `/home` — Teleport to your home location
+- Delete Home: `/delhome` — Remove your home location
 
 ### 🌍 Warp System
-- **Create Warps**: `/setwarp <name>` - Create server-wide warp points (Admin)
-- **Use Warps**: `/warp <name>` - Teleport to any warp location
-- **Delete Warps**: `/delwarp <name>` - Remove warp points (Admin)
-- **Tab Completion**: Smart auto-completion for warp names
+- Create Warps: `/setwarp <name>` — Create server-wide warp points (Admin)
+- Use Warps: `/warp <name>` — Teleport to any warp location
+- Delete Warps: `/delwarp <name>` — Remove warp points (Admin)
+- Tab Completion: Smart auto-completion for warp names
 
 ### ⬅️ Back Command
-- **Go Back**: `/back` - Return to your last location (death or teleport)
+- Go Back: `/back` — Return to your last location (death or teleport)
 - Automatically tracks death locations and teleportation history
 
+### 🔁 Player Teleport Requests (TPA)
+- `/tpa <player>` — Ask to teleport to another player
+- `/tpahere <player>` — Ask a player to teleport to you
+- `/tpaccept` — Accept the pending request
+- `/tpdeny` — Deny the pending request
+- Configurable request timeout
+
 ### 🛡️ Admin Commands
-- **Set Spawn**: `/setspawn` - Set the world spawn location
-- **Keep XP**: Players with permission keep experience on death
+- Set Spawn: `/setspawn` — Set the world spawn location
+- Keep XP: Players with permission keep experience on death
 
 ### 🎒 Utility Commands
-- **Enderchest**: `/enderchest` or `/ec` - Access your enderchest anywhere
-- **Workbench**: `/workbench` or `/wb` - Open a crafting table anywhere
+- Enderchest: `/enderchest` or `/ec` — Access your enderchest anywhere
+- Workbench: `/workbench` or `/wb` — Open a crafting table anywhere
+- Plugin Info: `/pitbullyinfo` — Show detailed plugin info and version
 
 ## 🏗️ Architecture
 
-### Clean Storage Architecture (v1.5.1+)
-- **Multiple Storage Backends**: Support for both file-based and database storage
-- **Automatic Migration**: Seamless migration from file to database storage
-- **Separation of Concerns**: Configuration (`config.yml`) separate from location data
-- **Interface-Based Design**: `LocationStorage` interface with multiple implementations
-- **Backward Compatibility**: Automatic migration from old single-file format
-- **Extensible**: Easy to add new storage backends
+### Clean Storage Architecture
+- Multiple Storage Backends: Support for both file-based and database storage
+- Automatic Migration: Seamless migration from file to database storage
+- Separation of Concerns: Configuration (`config.yml`) separate from location data
+- Interface-Based Design: `LocationStorage` interface with multiple implementations
+- Backward Compatibility: Automatic migration from old single-file format
+- Extensible: Easy to add new storage backends
 
-### Database Support (v1.5.2+)
-- **Multiple Databases**: MySQL, MariaDB, PostgreSQL, and SQLite support
-- **Connection Pooling**: HikariCP for optimal database performance
-- **Automatic Migration**: Seamless migration from `locations.yml` to database
-- **Zero Downtime**: Switch storage types without losing data
-- **Admin Choice**: Configure your preferred database in `config.yml`
-- **Lightweight Plugin**: Database drivers installed separately for optimal performance
+### Database Support
+- Multiple Databases: MySQL, MariaDB, PostgreSQL, and SQLite support
+- Connection Pooling: HikariCP for optimal database performance
+- Automatic Migration: Seamless migration from `locations.yml` to database
+- Zero Downtime: Switch storage types without losing data
+- Admin Choice: Configure your preferred database in `config.yml`
+- Lightweight Plugin: Database drivers installed separately for optimal performance
 
 ## 🚀 Installation
 
-1. **Download** the latest release from [GitHub Releases](https://github.com/Pitbully01/PitbullyPlugin/releases)
-2. **Place** the JAR file in your server's `plugins/` directory
-3. **Database Setup** (optional): See [Database Setup Guide](DATABASE_SETUP.md) for database storage
-4. **Restart** your server
-5. **Configure** permissions as needed
+1. Download the latest release from GitHub Releases
+2. Place the JAR file in your server's `plugins/` directory
+3. Database Setup (optional): See Database Setup Guide for database storage
+4. Restart your server
+5. Configure permissions as needed
 
 ## 📋 Requirements
 
-- **Minecraft Version**: 1.21.3 (compatible with Paper/Spigot)
-- **Java Version**: 21 or higher
-- **Server Software**: Paper, Spigot, or compatible forks
+- Minecraft Version: 1.21.3 (compatible with Paper/Spigot)
+- Java Version: 21 or higher
+- Server Software: Paper, Spigot, or compatible forks
 
 ## 🎮 Commands
 
@@ -78,6 +86,11 @@ A comprehensive Minecraft plugin providing teleportation commands including home
 | `/enderchest [player]` | Open enderchest | `pitbullyplugin.enderchest` | `/ec` |
 | `/workbench` | Open crafting table | `pitbullyplugin.workbench` | `/wb` |
 | `/setspawn` | Set world spawn | `pitbullyplugin.setworldspawn` | - |
+| `/pitbullyinfo` | Show detailed plugin info and version | `pitbullyplugin.info` | - |
+| `/tpa <player>` | Send a teleport request to another player | `pitbullyplugin.tpa` | - |
+| `/tpahere <player>` | Ask a player to teleport to you | `pitbullyplugin.tpahere` | - |
+| `/tpaccept` | Accept a pending teleport request | `pitbullyplugin.tpaccept` | - |
+| `/tpdeny` | Deny a pending teleport request | `pitbullyplugin.tpdeny` | - |
 
 ## 🔒 Permissions
 
@@ -90,6 +103,10 @@ pitbullyplugin.back: true          # Access to /back command
 pitbullyplugin.warp: true          # Access to /warp command
 pitbullyplugin.enderchest: true    # Access to own enderchest
 pitbullyplugin.workbench: true     # Access to /workbench command
+pitbullyplugin.tpa: true           # Send teleport requests
+pitbullyplugin.tpahere: true       # Ask a player to teleport to you
+pitbullyplugin.tpaccept: true      # Accept a pending request
+pitbullyplugin.tpdeny: true        # Deny a pending request
 ```
 
 ### Admin Permissions
@@ -123,7 +140,7 @@ Store location data in a SQL database for better performance and scalability:
 ```yaml
 database:
   storage-type: database  # Enable database storage
-  
+
   connection:
     type: mysql  # mysql, mariadb, postgresql, or sqlite
     host: localhost
@@ -131,45 +148,39 @@ database:
     database: pitbully_plugin
     username: your_username
     password: your_password
-    
+
     pool:
       max-connections: 10
       connection-timeout: 30000
       max-lifetime: 1800000
-    
+
     ssl:
       enabled: false
       verify-server-certificate: true
 ```
 
 #### Supported Databases
-- **MySQL** - Recommended for production servers
-- **MariaDB** - Excellent MySQL alternative
-- **PostgreSQL** - Advanced database features
-- **SQLite** - Single-file database, perfect for smaller servers
+- MySQL — Recommended for production servers
+- MariaDB — Excellent MySQL alternative
+- PostgreSQL — Advanced database features
+- SQLite — Single-file database, perfect for smaller servers
 
 #### Automatic Migration
 When switching from file to database storage:
-1. Change `storage-type` from `file` to `database` in config.yml
+1. Change `storage-type` from `file` to `database` in `config.yml`
 2. Configure your database connection settings
 3. Restart the server
 4. All data from `locations.yml` is automatically migrated to the database
-5. A backup of your original `locations.yml` is created in `migration-backups/`
 
 ### Plugin Configuration Files
 
-The plugin uses two separate configuration files for better organization:
-
-#### `config.yml` - Plugin Settings
+#### `config.yml` — Plugin Settings
 ```yaml
 # Plugin Settings
 settings:
-  # Whether to automatically create backup files
-  create-backups: true
-  
   # Whether to show debug messages in console
   debug-mode: false
-  
+
   # Teleportation safety settings
   teleport:
     # Check for safe teleport locations (avoid suffocation, lava, etc.)
@@ -177,11 +188,16 @@ settings:
     # Maximum distance to search for safe location
     max-safe-distance: 10
 
-# Database Settings  
+  # Teleport request settings
+  tpa:
+    # Timeout for /tpa and /tpahere requests in seconds
+    request-timeout-seconds: 30
+
+# Database Settings
 database:
   # Storage type: 'file' (default) or 'database'
   storage-type: file
-  
+
   # Database connection settings (only used when storage-type is 'database')
   connection:
     type: mysql  # mysql, mariadb, postgresql, sqlite
@@ -198,12 +214,12 @@ database:
 - Restart the server or reload the plugin to apply changes
 - All settings have safe defaults if not specified
 
-#### `locations.yml` - Location Data (Auto-generated)
+#### `locations.yml` — Location Data (Auto-generated)
 ```yaml
 # World spawn location (set via /setspawn command)
 worldSpawnLocation: null
 
-# Player home locations (set via /sethome command)  
+# Player home locations (set via /sethome command)
 homeLocations: {}
 
 # Server warp locations (set via /setwarp command)
@@ -219,61 +235,32 @@ lastTeleportLocations: {}
 lastLocations: {}
 ```
 
-**Note:** When database storage is enabled, this file is replaced by database tables.
-
-#### Database Storage (Optional)
-For high-performance servers, you can switch to database storage:
-
-```yaml
-database:
-  storage-type: database        # Switch from 'file' to 'database'
-  connection:
-    type: mysql                 # mysql, mariadb, postgresql, sqlite
-    host: localhost
-    port: 3306
-    database: pitbully_plugin
-    username: your_username
-    password: your_password
-```
-
-See [Database Setup Guide](DATABASE_SETUP.md) for detailed instructions.
-
-#### Automatic Backup System
-- Location data is automatically backed up (if enabled)
-- Backups are stored in `/plugins/PitbullyPlugin/backups/`
-- Backup files are timestamped: `locations_YYYY-MM-dd_HH-mm-ss.yml.bak`
-
-### Automatic Migration
-- **Existing Servers**: When upgrading from v1.5.0 or earlier, location data is automatically migrated from `config.yml` to `locations.yml`
-- **Database Migration**: When switching to database storage, data is automatically migrated from `locations.yml` to database
-- **Clean Separation**: After migration, `config.yml` is cleaned and ready for actual plugin configuration
-- **Zero Downtime**: Migration happens seamlessly during plugin startup
-- **Backup Creation**: Original files are automatically backed up before migration
+Note: When database storage is enabled, this file is replaced by database tables.
 
 ## 🛡️ Safety Features
 
-- **Safe Teleportation**: Automatically finds safe locations to prevent suffocation
-- **Modern World Support**: Compatible with Minecraft 1.18+ world heights (-64 to 319)
-- **Permission Checks**: All commands properly check permissions
-- **Data Persistence**: All locations are automatically saved and loaded
-- **Error Handling**: Comprehensive error handling with user-friendly messages
+- Safe Teleportation: Automatically finds safe locations to prevent suffocation
+- Modern World Support: Compatible with Minecraft 1.18+ world heights (-64 to 319)
+- Permission Checks: All commands properly check permissions
+- Data Persistence: All locations are automatically saved and loaded
+- Error Handling: Comprehensive error handling with user-friendly messages
 
 ## 🔧 Development
 
 ### Building from Source
 
-1. **Clone** the repository:
-   ```bash
-   git clone https://github.com/Pitbully01/PitbullyPlugin.git
-   cd PitbullyPlugin
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/Pitbully01/PitbullyPlugin.git
+cd PitbullyPlugin
+```
 
-2. **Build** with Maven:
-   ```bash
-   mvn clean package
-   ```
+2. Build with Maven:
+```bash
+mvn clean package
+```
 
-3. **Find** the compiled JAR in `target/PitbullyPlugin-1.5.4.jar`
+3. Find the compiled JAR in `target/PitbullyPlugin-1.6.0.jar`
 
 ### Development Requirements
 - Java 21 JDK
@@ -282,36 +269,34 @@ See [Database Setup Guide](DATABASE_SETUP.md) for detailed instructions.
 
 ## 📝 Changelog
 
-### Version 1.5.1 (Latest)
-- 🏗️ **Architecture**: Complete refactoring to clean, interface-based architecture
-- 📁 **New**: Separate `locations.yml` file for location data storage
-- 🔄 **Migration**: Automatic migration from old `config.yml` format
-- 📚 **Documentation**: Comprehensive JavaDoc documentation for all storage classes
-- 🔧 **Technical**: `LocationStorage` interface with `FileLocationStorage` implementation
-- 🔧 **Technical**: `LocationManager` as static wrapper for backward compatibility
-- ✅ **Compatibility**: 100% backward compatible - existing servers work without changes
-- 🧹 **Clean**: Separation of configuration and data for better organization
-- ⚙️ **New**: Configurable plugin settings (backups, debug mode, safety checks)
-- 💾 **New**: Automatic backup system for location data
-- 🛡️ **New**: Configurable teleportation safety features
-- 🐛 **New**: Debug mode for detailed logging and troubleshooting
+### Version 1.6.0 (Latest)
+- New: Player-to-player teleport requests: `/tpa`, `/tpahere`, `/tpaccept`, `/tpdeny`
+- Config: `settings.tpa.request-timeout-seconds` to control TPA request timeout
+- Config: Only writes missing keys to `config.yml`; no unnecessary overwrites
+- Removed: Legacy backup functionality (code and docs)
+- UX: Cleanup pending TPA requests when a player disconnects
+
+### Version 1.5.1
+- Architecture: Refactoring to clean, interface-based architecture
+- New: Separate `locations.yml` file for location data storage
+- Migration: Automatic migration from old `config.yml` format
+- Documentation: JavaDoc for storage classes
+- Technical: `LocationStorage` interface with `FileLocationStorage`
+- Technical: `LocationManager` as static wrapper for backward compatibility
+- New: Configurable teleportation safety features
+- New: Debug mode for detailed logging
 
 ### Version 1.5.0
-- ✨ **New**: Added `/setspawn` command for world spawn management
-- ✨ **New**: Comprehensive JavaDoc documentation for all classes
-- 🔄 **Breaking**: Updated permission system from `pit.*` to `pitbullyplugin.*`
-- 🔄 **Breaking**: Complete plugin.yml restructure with proper descriptions
-- 🚀 **Improved**: Refactored all 11 commands with consistent error handling
-- 🚀 **Improved**: Enhanced SafeTeleport with modern Minecraft 1.18+ support
-- 🚀 **Improved**: Better LocationListener with improved teleport tracking
-- 🛠️ **Technical**: Professional code standards and comprehensive error handling
-- 🛠️ **Technical**: Enhanced configuration management and data persistence
-
-[View full changelog](CHANGELOG.md)
+- New: Added `/setspawn` command for world spawn management
+- New: Comprehensive JavaDoc documentation for all classes
+- Breaking: Updated permission system from `pit.*` to `pitbullyplugin.*`
+- Improved: Enhanced SafeTeleport with modern world support
+- Improved: Better LocationListener with improved teleport tracking
+- Technical: Comprehensive error handling and configuration management
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, open an issue first to discuss what you would like to change.
 
 ### Development Guidelines
 - Follow existing code style and conventions
@@ -325,8 +310,8 @@ This project is licensed under the GNU General Public License v3.0 (GPL-3.0). Se
 
 ## 🐛 Bug Reports & Feature Requests
 
-- **Bug Reports**: [GitHub Issues](https://github.com/Pitbully01/PitbullyPlugin/issues)
-- **Feature Requests**: [GitHub Discussions](https://github.com/Pitbully01/PitbullyPlugin/discussions)
+- Bug Reports: GitHub Issues
+- Feature Requests: GitHub Discussions
 
 ## 👨‍💻 Author
 
@@ -342,4 +327,4 @@ This project is licensed under the GNU General Public License v3.0 (GPL-3.0). Se
 
 ---
 
-⭐ **If you find this plugin useful, please consider giving it a star on GitHub!**
+⭐ If you find this plugin useful, please consider giving it a star on GitHub!
