@@ -53,7 +53,7 @@ import java.util.logging.Level;
  * back command, and utility commands like enderchest and workbench access.
  * 
  * @author Pitbully01
- * @version 1.6.0
+ * @version 1.6.1
  * @since 1.0.0
  */
 public final class PitbullyPlugin extends JavaPlugin {

@@ -2,6 +2,7 @@ package de.pitbully.pitbullyplugin.storage;
 
 import de.pitbully.pitbullyplugin.PitbullyPlugin;
 import de.pitbully.pitbullyplugin.utils.ConfigManager;
+import de.pitbully.pitbullyplugin.utils.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -32,7 +33,9 @@ public class FileLocationStorage implements LocationStorage {
     private final File locationsFile;
     private final Logger logger;
     
-    // In-memory storage maps (wie in der ursprünglichen Locations Klasse)
+    // New player-centric in-memory storage
+    private final Map<UUID, PlayerData> players = new HashMap<>();
+    // Backwards-compatible caches (filled from players map); operations write-through to players map
     private final Map<UUID, Location> deathLocations = new HashMap<>();
     private final Map<UUID, Location> teleportLocations = new HashMap<>();
     private final Map<UUID, Location> lastLocations = new HashMap<>();
@@ -95,12 +98,15 @@ public class FileLocationStorage implements LocationStorage {
      * Initializes the default structure for locations.yml to prevent completely empty files.
      */
     private void initializeDefaultStructure() {
-        locationsConfig.set("worldSpawnLocation", null);
-        locationsConfig.set("homeLocations", new HashMap<String, Object>());
-        locationsConfig.set("warpLocations", new HashMap<String, Object>());
-        locationsConfig.set("lastDeathLocations", new HashMap<String, Object>());
-        locationsConfig.set("lastTeleportLocations", new HashMap<String, Object>());
-        locationsConfig.set("lastLocations", new HashMap<String, Object>());
+    locationsConfig.set("worldSpawnLocation", null);
+    locationsConfig.set("warpLocations", new HashMap<String, Object>());
+    // New grouped structure
+    locationsConfig.set("players", new HashMap<String, Object>());
+    // Legacy sections kept for migration; will be pruned on save
+    locationsConfig.set("homeLocations", new HashMap<String, Object>());
+    locationsConfig.set("lastDeathLocations", new HashMap<String, Object>());
+    locationsConfig.set("lastTeleportLocations", new HashMap<String, Object>());
+    locationsConfig.set("lastLocations", new HashMap<String, Object>());
     }
     
 
@@ -114,7 +120,9 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void saveDeathLocation(UUID playerId, Location location) {
-        deathLocations.put(playerId, location);
+    deathLocations.put(playerId, location);
+    PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
+    data.setLastDeath(location);
     }
 
     /**
@@ -125,7 +133,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public Location getDeathLocation(UUID playerId) {
-        return deathLocations.get(playerId);
+    return deathLocations.get(playerId);
     }
 
     /**
@@ -146,7 +154,9 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void saveTeleportLocation(UUID playerId, Location location) {
-        teleportLocations.put(playerId, location);
+    teleportLocations.put(playerId, location);
+    PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
+    data.setLastTeleport(location);
     }
 
     /**
@@ -157,7 +167,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public Location getTeleportLocation(UUID playerId) {
-        return teleportLocations.get(playerId);
+    return teleportLocations.get(playerId);
     }
 
     /**
@@ -179,7 +189,9 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void saveLastLocation(UUID playerId, Location location) {
-        lastLocations.put(playerId, location);
+    lastLocations.put(playerId, location);
+    PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
+    data.setLastLocation(location);
     }
 
     /**
@@ -190,7 +202,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public Location getLastLocation(UUID playerId) {
-        return lastLocations.get(playerId);
+    return lastLocations.get(playerId);
     }
 
     /**
@@ -201,7 +213,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public boolean checkLastLocation(UUID playerId) {
-        return lastLocations.containsKey(playerId);
+    return lastLocations.containsKey(playerId);
     }
 
     /**
@@ -221,7 +233,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public Map<UUID, Location> getAllLastLocations() {
-        return new HashMap<>(lastLocations);
+    return new HashMap<>(lastLocations);
     }
 
     /**
@@ -232,7 +244,9 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void saveHomeLocation(UUID playerId, Location location) {
-        homeLocations.put(playerId, location);
+    homeLocations.put(playerId, location);
+    PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
+    data.setHome(location);
     }
 
     /**
@@ -243,7 +257,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public Location getHomeLocation(UUID playerId) {
-        return homeLocations.get(playerId);
+    return homeLocations.get(playerId);
     }
 
     /**
@@ -254,7 +268,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public boolean hasHomeLocation(UUID playerId) {
-        return homeLocations.containsKey(playerId);
+    return homeLocations.containsKey(playerId);
     }
 
     /**
@@ -264,7 +278,9 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void deleteHomeLocation(UUID playerId) {
-        homeLocations.remove(playerId);
+    homeLocations.remove(playerId);
+    PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
+    data.setHome(null);
     }
 
     /**
@@ -274,7 +290,7 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public Map<UUID, Location> getAllHomeLocations() {
-        return new HashMap<>(homeLocations);
+    return new HashMap<>(homeLocations);
     }
 
 
@@ -360,10 +376,12 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void loadAll() {
-        loadLocationsFromSection("lastDeathLocations", deathLocations);
-        loadLocationsFromSection("lastTeleportLocations", teleportLocations);
-        loadLocationsFromSection("lastLocations", lastLocations);
-        loadLocationsFromSection("homeLocations", homeLocations);
+    // 1) New grouped players section
+    loadPlayersSection();
+    // 2) Legacy sections (if present) -> migrate to players map
+    migrateLegacySections();
+    // 3) Fill compatibility maps from players
+    rebuildCompatibilityCachesFromPlayers();
         loadWarpsFromSection("warpLocations");
         loadWorldSpawnLocation();
     }
@@ -375,10 +393,13 @@ public class FileLocationStorage implements LocationStorage {
      */
     @Override
     public void saveAll() {
-        saveLocationsToSection("lastDeathLocations", deathLocations);  // Geändert für Konsistenz
-        saveLocationsToSection("lastTeleportLocations", teleportLocations);  // Geändert für Konsistenz
-        saveLocationsToSection("lastLocations", lastLocations);
-        saveLocationsToSection("homeLocations", homeLocations);
+    // Persist new grouped players structure
+    savePlayersSection();
+    // Clear legacy sections to avoid divergence
+    locationsConfig.set("lastDeathLocations", null);
+    locationsConfig.set("lastTeleportLocations", null);
+    locationsConfig.set("lastLocations", null);
+    locationsConfig.set("homeLocations", null);
         saveWorldSpawnLocation();
         saveWarpsToSection("warpLocations");
         
@@ -416,13 +437,20 @@ public class FileLocationStorage implements LocationStorage {
         }
     }
     
-    
 
-    private void saveLocationsToSection( String sectionName, Map<UUID, Location> locationMap) {
-        // Clear existing section to prevent orphaned entries
-        locationsConfig.set(sectionName, null);
-        for (Map.Entry<UUID, Location> entry : locationMap.entrySet()) {
-            locationsConfig.set(sectionName + "." + entry.getKey(), entry.getValue());
+    /**
+     * Saves the new grouped players section from the in-memory players map.
+     */
+    private void savePlayersSection() {
+        locationsConfig.set("players", null);
+        for (Map.Entry<UUID, PlayerData> entry : players.entrySet()) {
+            PlayerData data = entry.getValue();
+            if (data == null || data.isEmpty()) continue;
+            String base = "players." + entry.getKey();
+            locationsConfig.set(base + ".lastDeath", data.getLastDeath());
+            locationsConfig.set(base + ".lastTeleport", data.getLastTeleport());
+            locationsConfig.set(base + ".lastLocation", data.getLastLocation());
+            locationsConfig.set(base + ".home", data.getHome());
         }
     }
 
@@ -450,27 +478,79 @@ public class FileLocationStorage implements LocationStorage {
     private void saveWorldSpawnLocation() {
         locationsConfig.set("worldSpawnLocation", worldSpawn);
     }
+    
+
     /**
-     * Loads player location data from a configuration section.
-     * Helper method to load UUID-based location maps from locationsConfig.
-     * 
-     * @param sectionName The name of the config section
-     * @param locationMap The map to populate with loaded data
+     * Loads the new grouped players section into memory.
      */
-    private void loadLocationsFromSection(String sectionName, Map<UUID, Location> locationMap) {
-        ConfigurationSection section = locationsConfig.getConfigurationSection(sectionName);
-        if (section != null) {
-            for (String key : section.getKeys(false)) {
-                try {
-                    UUID playerId = UUID.fromString(key);
-                    Location location = (Location) locationsConfig.get(sectionName + "." + key);
-                    if (location != null) {
-                        locationMap.put(playerId, location);
-                    }
-                } catch (IllegalArgumentException e) {
-                    // Skip invalid UUID entries
+    private void loadPlayersSection() {
+        ConfigurationSection playersSection = locationsConfig.getConfigurationSection("players");
+        if (playersSection == null) {
+            return;
+        }
+        for (String key : playersSection.getKeys(false)) {
+            try {
+                UUID playerId = UUID.fromString(key);
+                ConfigurationSection pSec = playersSection.getConfigurationSection(key);
+                PlayerData data = PlayerData.fromConfig(pSec);
+                if (data != null && !data.isEmpty()) {
+                    players.put(playerId, data);
                 }
+            } catch (IllegalArgumentException ignored) {
             }
+        }
+    }
+
+    /**
+     * Migrates legacy flat sections into the new players map if they exist.
+     */
+    private void migrateLegacySections() {
+        // lastDeathLocations
+        mergeLegacySectionIntoPlayers("lastDeathLocations", (pd, loc) -> pd.setLastDeath(loc));
+        // lastTeleportLocations
+        mergeLegacySectionIntoPlayers("lastTeleportLocations", (pd, loc) -> pd.setLastTeleport(loc));
+        // lastLocations
+        mergeLegacySectionIntoPlayers("lastLocations", (pd, loc) -> pd.setLastLocation(loc));
+        // homeLocations
+        mergeLegacySectionIntoPlayers("homeLocations", (pd, loc) -> pd.setHome(loc));
+    }
+
+    @FunctionalInterface
+    private interface PlayerLocationSetter {
+        void apply(PlayerData data, Location location);
+    }
+
+    private void mergeLegacySectionIntoPlayers(String sectionName, PlayerLocationSetter setter) {
+        ConfigurationSection section = locationsConfig.getConfigurationSection(sectionName);
+        if (section == null) return;
+        for (String key : section.getKeys(false)) {
+            try {
+                UUID playerId = UUID.fromString(key);
+                Location location = (Location) locationsConfig.get(sectionName + "." + key);
+                if (location != null) {
+                    PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
+                    setter.apply(data, location);
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+    }
+
+    /**
+     * Rebuilds the compatibility maps (death/teleport/last/home) from the players map.
+     */
+    private void rebuildCompatibilityCachesFromPlayers() {
+        deathLocations.clear();
+        teleportLocations.clear();
+        lastLocations.clear();
+        homeLocations.clear();
+        for (Map.Entry<UUID, PlayerData> e : players.entrySet()) {
+            UUID id = e.getKey();
+            PlayerData d = e.getValue();
+            if (d.getLastDeath() != null) deathLocations.put(id, d.getLastDeath());
+            if (d.getLastTeleport() != null) teleportLocations.put(id, d.getLastTeleport());
+            if (d.getLastLocation() != null) lastLocations.put(id, d.getLastLocation());
+            if (d.getHome() != null) homeLocations.put(id, d.getHome());
         }
     }
 
