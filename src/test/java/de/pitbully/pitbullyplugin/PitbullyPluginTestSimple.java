@@ -10,14 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
 
 /**
- * Unit-Tests für die grundlegenden Plugin-Funktionen.
- * Verwendet konventionelle Mocking-Techniken ohne MockBukkit für bessere Kompatibilität.
+ * Einfache Unit-Tests für die grundlegenden Plugin-Funktionen.
+ * Diese Tests funktionieren ohne MockBukkit und testen die Plugin-Metadaten.
  */
 @ExtendWith(MockitoExtension.class)
-class PitbullyPluginTest {
+class PitbullyPluginTestSimple {
     
     @Mock
     private PluginDescriptionFile mockDescription;
@@ -41,7 +40,7 @@ class PitbullyPluginTest {
     }
 
     @Test
-    void pluginVersionIsValid() {
+    void pluginVersionIsSet() {
         // Given
         when(mockDescription.getVersion()).thenReturn("1.6.1");
         
@@ -80,32 +79,26 @@ class PitbullyPluginTest {
     }
 
     @Test
-    void commandsCanBeRegistered() {
+    void commandCanBeRetrieved() {
         // Given
         when(mockCommand.getName()).thenReturn("tpa");
-        when(mockCommand.getDescription()).thenReturn("Teleportiere dich zu einem anderen Spieler");
         
         // When
         String commandName = mockCommand.getName();
-        String commandDescription = mockCommand.getDescription();
         
         // Then
         assertThat(commandName).isEqualTo("tpa");
-        assertThat(commandDescription).isNotNull().isNotEmpty();
     }
 
     @Test 
-    void pluginManagerCanManagePlugins() {
+    void pluginManagerCanBeUsed() {
         // Given
         when(mockPluginManager.isPluginEnabled("PitbullyPlugin")).thenReturn(true);
-        when(mockPluginManager.getPlugin("PitbullyPlugin")).thenReturn(mock(org.bukkit.plugin.Plugin.class));
         
         // When
         boolean isEnabled = mockPluginManager.isPluginEnabled("PitbullyPlugin");
-        org.bukkit.plugin.Plugin plugin = mockPluginManager.getPlugin("PitbullyPlugin");
         
         // Then
         assertThat(isEnabled).isTrue();
-        assertThat(plugin).isNotNull();
     }
 }

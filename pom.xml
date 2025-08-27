@@ -38,11 +38,16 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
-                    <!-- Silence JDK 21 warning about dynamically loaded agents (Mockito/ByteBuddy) -->
-                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <!-- JDK 21 compatibility für MockBukkit und Bukkit -->
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
+                    <!-- Parallele Test-Ausführung -->
+                    <parallel>methods</parallel>
+                    <threadCount>4</threadCount>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
             <plugin>
@@ -174,7 +179,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Testing: Mockito (core + inline for final/static mocking) -->
+        <!-- Testing: Mockito (nur für spezifische Unit-Tests) -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -183,8 +188,8 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>5.2.0</version>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -193,14 +198,6 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.25.3</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- MockBukkit - Real Bukkit testing environment -->
-        <dependency>
-            <groupId>com.github.seeseemelk</groupId>
-            <artifactId>MockBukkit-v1.21</artifactId>
-            <version>3.132.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

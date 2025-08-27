@@ -63,7 +63,57 @@ class BackCommandTest {
             BackCommand cmd = new BackCommand();
             boolean handled = cmd.onCommand(player, mock(Command.class), "back", new String[]{});
             assertThat(handled).isTrue();
+            
+            // Verify the actual teleportation was attempted
+            st.verify(() -> SafeTeleport.teleport(player, last));
+            // Verify success message
             verify(player).sendMessage(contains("Zurück teleportiert"));
+        }
+    }
+
+    @Test
+    void playerBackFailsWhenTeleportFails() {
+        Player player = mock(Player.class);
+        when(player.hasPermission(anyString())).thenReturn(true);
+        UUID id = UUID.randomUUID();
+        when(player.getUniqueId()).thenReturn(id);
+
+        World world = mock(World.class);
+        when(world.getName()).thenReturn("world");
+        Location last = new Location(world, 1, 64, 1);
+
+        try (MockedStatic<LocationManager> lm = mockStatic(LocationManager.class);
+             MockedStatic<SafeTeleport> st = mockStatic(SafeTeleport.class)) {
+            lm.when(() -> LocationManager.checkLastLocation(id)).thenReturn(true);
+            lm.when(() -> LocationManager.getLastLocation(id)).thenReturn(last);
+            st.when(() -> SafeTeleport.teleport(player, last)).thenReturn(false); // Teleport fails
+
+            BackCommand cmd = new BackCommand();
+            boolean handled = cmd.onCommand(player, mock(Command.class), "back", new String[]{});
+            assertThat(handled).isTrue();
+            
+            // Should still attempt teleport
+            st.verify(() -> SafeTeleport.teleport(player, last));
+            // Should NOT send success message when teleport fails
+            verify(player, never()).sendMessage(contains("Zurück teleportiert"));
+        }
+    }
+
+    @Test
+    void noPermissionIsCheckedBeforeLocationCheck() {
+        Player player = mock(Player.class);
+        when(player.hasPermission(anyString())).thenReturn(false);
+        UUID id = UUID.randomUUID();
+        when(player.getUniqueId()).thenReturn(id);
+
+        try (MockedStatic<LocationManager> lm = mockStatic(LocationManager.class)) {
+            BackCommand cmd = new BackCommand();
+            boolean handled = cmd.onCommand(player, mock(Command.class), "back", new String[]{});
+            assertThat(handled).isTrue();
+            
+            // Should NOT check location if permission is missing
+            lm.verify(() -> LocationManager.checkLastLocation(id), never());
+            verify(player).sendMessage(contains("keine Berechtigung"));
         }
     }
 }
