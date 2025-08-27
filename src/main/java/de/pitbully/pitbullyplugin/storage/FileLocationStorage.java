@@ -451,6 +451,7 @@ public class FileLocationStorage implements LocationStorage {
             locationsConfig.set(base + ".lastTeleport", data.getLastTeleport());
             locationsConfig.set(base + ".lastLocation", data.getLastLocation());
             locationsConfig.set(base + ".home", data.getHome());
+            locationsConfig.set(base + ".keepXp", data.isKeepXp());
         }
     }
 
@@ -526,13 +527,76 @@ public class FileLocationStorage implements LocationStorage {
         for (String key : section.getKeys(false)) {
             try {
                 UUID playerId = UUID.fromString(key);
-                Location location = (Location) locationsConfig.get(sectionName + "." + key);
+                Location location = loadLocationFromPath(sectionName + "." + key);
                 if (location != null) {
                     PlayerData data = players.computeIfAbsent(playerId, id -> new PlayerData());
                     setter.apply(data, location);
                 }
             } catch (IllegalArgumentException ignored) {
             }
+        }
+    }
+
+    /**
+     * Loads a Location from a configuration path, supporting both
+     * Bukkit serialized format and simplified test format.
+     */
+    private Location loadLocationFromPath(String path) {
+        // Try Bukkit deserialization first (production format)
+        try {
+            Object obj = locationsConfig.get(path);
+            if (obj instanceof Location) {
+                return (Location) obj;
+            }
+        } catch (Exception ignored) {
+            // Fall through to simplified format
+        }
+
+        // Try simplified format (test format)
+        ConfigurationSection section = locationsConfig.getConfigurationSection(path);
+        if (section != null && section.contains("world") && section.contains("x")) {
+            return createLocationFromSection(section);
+        }
+
+        return null;
+    }
+
+    /**
+     * Creates a Location from a simplified ConfigurationSection.
+     * Used for test data that doesn't use Bukkit serialization.
+     */
+    private Location createLocationFromSection(ConfigurationSection section) {
+        try {
+            String worldName = section.getString("world");
+            double x = section.getDouble("x");
+            double y = section.getDouble("y");
+            double z = section.getDouble("z");
+            float pitch = (float) section.getDouble("pitch", 0.0);
+            float yaw = (float) section.getDouble("yaw", 0.0);
+
+            // Try to get real world first - works with MockBukkit
+            org.bukkit.World world = null;
+            try {
+                world = org.bukkit.Bukkit.getWorld(worldName);
+            } catch (Exception ignored) {
+                // No Bukkit server available
+            }
+            
+            if (world == null) {
+                // In test environments without real worlds, we still need Location objects
+                // for migration testing. Create a Location with null world - this will
+                // allow the coordinate data to be preserved and migrated.
+                try {
+                    return new Location(null, x, y, z, yaw, pitch);
+                } catch (Exception e) {
+                    // If Location creation fails with null world, return null
+                    return null;
+                }
+            }
+
+            return new Location(world, x, y, z, yaw, pitch);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -564,7 +628,7 @@ public class FileLocationStorage implements LocationStorage {
         ConfigurationSection section = locationsConfig.getConfigurationSection(sectionName);
         if (section != null) {
             for (String key : section.getKeys(false)) {
-                Location location = (Location) locationsConfig.get(sectionName + "." + key);
+                Location location = loadLocationFromPath(sectionName + "." + key);
                 if (location != null) {
                     warpLocations.put(key, location);
                 }
@@ -576,7 +640,7 @@ public class FileLocationStorage implements LocationStorage {
      * Loads the world spawn location from configuration.
      */
     private void loadWorldSpawnLocation() {
-        worldSpawn = (Location) locationsConfig.get("worldSpawnLocation");
+        worldSpawn = loadLocationFromPath("worldSpawnLocation");
         if (worldSpawn != null) {
             setWorldSpawn();
         }
@@ -614,5 +678,28 @@ public class FileLocationStorage implements LocationStorage {
     @Override
     public Location getLastTeleportLocation(UUID uniqueId) {
         return teleportLocations.get(uniqueId);
+    }
+    
+    @Override
+    public PlayerData getPlayerData(UUID playerId) {
+        return players.get(playerId); // Return null if no data exists
+    }
+    
+    @Override
+    public void savePlayerData(UUID playerId, PlayerData playerData) {
+        if (playerData == null) {
+            players.remove(playerId);
+        } else {
+            players.put(playerId, playerData);
+        }
+    }
+    
+    /**
+     * Gets all player data for migration purposes.
+     * 
+     * @return Map of all player UUIDs to their PlayerData
+     */
+    public Map<UUID, PlayerData> getAllPlayerData() {
+        return new HashMap<>(players);
     }
 }

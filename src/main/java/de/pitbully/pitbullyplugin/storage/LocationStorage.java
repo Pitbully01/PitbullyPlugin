@@ -262,4 +262,37 @@ public interface LocationStorage {
      * @return The player's last teleport location, or null if none exists
      */
     Location getLastTeleportLocation(UUID uniqueId);
+
+    /**
+     * Gets player data for a specific player.
+     * @param playerId The UUID of the player
+     * @return The PlayerData object for the player
+     */
+    de.pitbully.pitbullyplugin.utils.PlayerData getPlayerData(UUID playerId);
+    
+    /**
+     * Saves player data for a specific player.
+     * @param playerId The UUID of the player
+     * @param playerData The PlayerData object to save
+     */
+    void savePlayerData(UUID playerId, de.pitbully.pitbullyplugin.utils.PlayerData playerData);
+
+    /**
+     * Convenience method to check if a player keeps XP on death.
+     * @param player The player to check
+     * @return true if the player should keep XP on death
+     */
+    static boolean isKeepingXp(org.bukkit.entity.Player player) {
+        // Players have default keep XP enabled, but check if the player changed it or when they don't have permission they also don't have it
+        if (!player.hasPermission("pitbullyplugin.keepxp")) {
+            return false;
+        }
+        try {
+            de.pitbully.pitbullyplugin.storage.LocationStorage storage = de.pitbully.pitbullyplugin.storage.LocationManager.getStorage();
+            de.pitbully.pitbullyplugin.utils.PlayerData data = storage.getPlayerData(player.getUniqueId());
+            return data != null ? data.isKeepXp() : true; // Default to true if no data exists
+        } catch (Exception e) {
+            return true; // Default to keeping XP if there's an error
+        }
+    }
 }

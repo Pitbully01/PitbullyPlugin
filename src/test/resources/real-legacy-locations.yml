@@ -1,0 +1,218 @@
+# Real anonymized locations.yml from PitbullyPlugin v1.6.0
+# Used for integration testing of legacy format migration
+# UUIDs have been anonymized but maintain realistic structure
+# Location format simplified for test environment (no Bukkit server required)
+
+worldSpawnLocation:
+  world: world
+  x: 175.40310799163566
+  y: 64.0
+  z: -50.912283160304185
+  pitch: 0.49617073
+  yaw: -45.374237
+
+lastDeathLocations:
+  # Player A - has death location
+  a1b2c3d4-1111-4444-8888-000000000001:
+    world: world
+    x: 338.7112613644273
+    y: 76.0
+    z: -197.79562057506362
+    pitch: 34.349953
+    yaw: -129.90042
+  # Player B - has death location  
+  a1b2c3d4-2222-4444-8888-000000000002:
+    world: world
+    x: 164.9396864075627
+    y: 0.39999997615814215
+    z: -40.47662600194755
+    pitch: -49.699055
+    yaw: 100.985504
+  # Player C - has death location
+  a1b2c3d4-3333-4444-8888-000000000003:
+    world: world
+    x: 216.69229452569118
+    y: 68.0
+    z: -92.4155746243735
+    pitch: 24.46653
+    yaw: -68.340454
+
+lastTeleportLocations:
+  # Player A - has teleport location
+  a1b2c3d4-1111-4444-8888-000000000001:
+    world: world
+    x: 192.5
+    y: 64.0
+    z: -42.5
+    pitch: 0.0
+    yaw: -180.0
+  # Player D - only has teleport, no other data
+  a1b2c3d4-4444-4444-8888-000000000004:
+    world: world
+    x: 355.969906479369
+    y: 84.0
+    z: -188.13382229520658
+    pitch: 7.199807
+    yaw: 141.0008
+  # Player B - has teleport location
+  a1b2c3d4-2222-4444-8888-000000000002:
+    world: world
+    x: 185.08383571916812
+    y: 64.0
+    z: -45.52596554735394
+    pitch: 22.17525
+    yaw: -161.09879
+  # Player C - has teleport location
+  a1b2c3d4-3333-4444-8888-000000000003:
+    world: world
+    x: 178.5
+    y: 64.0
+    z: -53.5
+    pitch: -2.4128747
+    yaw: -55.26702
+
+lastLocations:
+  # Player A - has last location
+  a1b2c3d4-1111-4444-8888-000000000001:
+    world: world
+    x: 192.5
+    y: 64.0
+    z: -42.5
+    pitch: 0.0
+    yaw: -180.0
+  # Player D - has last location
+  a1b2c3d4-4444-4444-8888-000000000004:
+    world: world
+    x: 355.969906479369
+    y: 84.0
+    z: -188.13382229520658
+    pitch: 7.199807
+    yaw: 141.0008
+  # Player B - has last location
+  a1b2c3d4-2222-4444-8888-000000000002:
+    world: world
+    x: 185.08383571916812
+    y: 64.0
+    z: -45.52596554735394
+    pitch: 22.17525
+    yaw: -161.09879
+  # Player C - has last location
+  a1b2c3d4-3333-4444-8888-000000000003:
+    world: world
+    x: 178.5
+    y: 64.0
+    z: -53.5
+    pitch: -2.4128747
+    yaw: -55.26702
+
+homeLocations:
+  # Player A - has home
+  a1b2c3d4-1111-4444-8888-000000000001:
+    world: world
+    x: 189.47878411582298
+    y: 64.0
+    z: -41.1457465816564
+    pitch: 26.850065
+    yaw: -89.40005
+  # Player B - has home
+  a1b2c3d4-2222-4444-8888-000000000002:
+    world: world
+    x: 189.64568052269811
+    y: 64.0
+    z: -43.4453039151906
+    pitch: 1.0014238
+    yaw: 89.95996
+
+warpLocations:
+  # Various server warps with anonymized names
+  farm_area:
+    world: world
+    x: 150.79991973626537
+    y: 64.0
+    z: 4.636693062415068
+    pitch: 24.299902
+    yaw: -73.49829
+  mining_spot:
+    world: world
+    x: 43.61653454455055
+    y: 126.0
+    z: 85.9310068785862
+    pitch: 6.2999578
+    yaw: -159.00104
+  trade_center:
+    world: world
+    x: 369.62152605491576
+    y: 70.9375
+    z: -190.56089400173983
+    pitch: 27.749805
+    yaw: -11.549133
+  resource_point_a:
+    world: world
+    x: 8.717338030483731
+    y: 69.0
+    z: -123.98856952510417
+    pitch: 9.450073
+    yaw: -144.44797
+  cave_entrance:
+    world: world
+    x: 312.6785143745211
+    y: 68.0
+    z: -41.08264733346452
+    pitch: 20.100155
+    yaw: -52.789062
+  cave_upper:
+    world: world
+    x: 243.31026911246866
+    y: 95.0
+    z: -59.526782230974355
+    pitch: 31.499966
+    yaw: 100.34932
+  resource_point_b:
+    world: world
+    x: 189.56373508317907
+    y: 63.0
+    z: -16.811478337631797
+    pitch: 27.600044
+    yaw: 94.49884
+  dungeon_area:
+    world: world
+    x: 325.1958810951927
+    y: 69.0
+    z: 113.69999998807907
+    pitch: 0.4501539
+    yaw: 26.42566
+  biome_savanna:
+    world: world
+    x: 1701.423447025535
+    y: 64.0
+    z: 9.67349912967903
+    pitch: 5.393315
+    yaw: 3.033722
+  cave_main:
+    world: world
+    x: 56.309206423757736
+    y: 115.0
+    z: 65.9837274100709
+    pitch: 14.099978
+    yaw: -163.50055
+  resource_point_c:
+    world: world
+    x: 222.58190258572435
+    y: 69.55321338701523
+    z: -117.18611997772076
+    pitch: 8.10004
+    yaw: -98.85028
+  mining_cave:
+    world: world
+    x: 90.46322615810912
+    y: 53.0
+    z: 100.69999998807907
+    pitch: -12.749818
+    yaw: 12.605347
+  biome_desert:
+    world: world
+    x: -484.1747267771526
+    y: 95.0
+    z: -2145.3965650365444
+    pitch: 23.63258
+    yaw: 167.45813

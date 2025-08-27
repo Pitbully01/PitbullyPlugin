@@ -38,13 +38,12 @@ public class PlayerDeathListener implements Listener {
         // Save death location for /back command
         LocationManager.updateLastDeathLocations(player.getUniqueId(), player.getLocation());
         
-        // Handle experience keeping if player has permission
-        if (player.hasPermission("pitbullyplugin.keepxp")) {
+        // Handle experience keeping based on player's setting
+        if (de.pitbully.pitbullyplugin.storage.LocationStorage.isKeepingXp(player)) {
             int exp = player.getTotalExperience();
             event.setKeepLevel(true);
             event.setDroppedExp(0);
             player.setTotalExperience(exp);
-            
         }
     }
 }

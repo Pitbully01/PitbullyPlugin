@@ -46,14 +46,14 @@ public class BackCommand implements CommandExecutor {
         
         Player player = (Player) commandSender;
         
+        if (!player.hasPermission("pitbullyplugin.back")) {
+            player.sendMessage("§cDu hast keine Berechtigung für diesen Befehl!");
+            return true;
+        }
+
         if (args.length > 1) {
             player.sendMessage("§cFehler: Zu viele Argumente!");
             player.sendMessage("§eVerwendung: /back [death|teleport]");
-            return true;
-        }
-        
-        if (!player.hasPermission("pitbullyplugin.back")) {
-            player.sendMessage("§cDu hast keine Berechtigung für diesen Befehl!");
             return true;
         }
 

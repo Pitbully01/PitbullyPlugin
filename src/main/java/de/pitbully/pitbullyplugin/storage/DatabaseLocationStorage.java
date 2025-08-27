@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import de.pitbully.pitbullyplugin.utils.PlayerData;
+
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -639,24 +641,43 @@ public class DatabaseLocationStorage implements LocationStorage {
         logger.info("Starting migration from file storage to database...");
         
         try {
+            // Migrate PlayerData first (includes keepXp settings)
+            Map<UUID, PlayerData> allPlayerData = fileStorage.getAllPlayerData();
+            logger.info("Migrating " + allPlayerData.size() + " player data entries...");
+            for (Map.Entry<UUID, PlayerData> entry : allPlayerData.entrySet()) {
+                savePlayerData(entry.getKey(), entry.getValue());
+            }
+            
+            // Migrate legacy individual location data (for players not in PlayerData format)
+            // This ensures backwards compatibility with old file formats
+            
             // Migrate death locations
             for (Map.Entry<UUID, Location> entry : fileStorage.getAllDeathLocations().entrySet()) {
-                saveDeathLocation(entry.getKey(), entry.getValue());
+                // Only migrate if not already in PlayerData
+                if (!allPlayerData.containsKey(entry.getKey())) {
+                    saveDeathLocation(entry.getKey(), entry.getValue());
+                }
             }
             
             // Migrate teleport locations
             for (Map.Entry<UUID, Location> entry : fileStorage.getAllTeleportLocations().entrySet()) {
-                saveTeleportLocation(entry.getKey(), entry.getValue());
+                if (!allPlayerData.containsKey(entry.getKey())) {
+                    saveTeleportLocation(entry.getKey(), entry.getValue());
+                }
             }
             
             // Migrate last locations
             for (Map.Entry<UUID, Location> entry : fileStorage.getAllLastLocations().entrySet()) {
-                saveLastLocation(entry.getKey(), entry.getValue());
+                if (!allPlayerData.containsKey(entry.getKey())) {
+                    saveLastLocation(entry.getKey(), entry.getValue());
+                }
             }
             
             // Migrate home locations
             for (Map.Entry<UUID, Location> entry : fileStorage.getAllHomeLocations().entrySet()) {
-                saveHomeLocation(entry.getKey(), entry.getValue());
+                if (!allPlayerData.containsKey(entry.getKey())) {
+                    saveHomeLocation(entry.getKey(), entry.getValue());
+                }
             }
             
             // Migrate warp locations
@@ -732,6 +753,146 @@ public class DatabaseLocationStorage implements LocationStorage {
     @Override
     public Location getLastTeleportLocation(UUID uniqueId) {
         return getPlayerLocation(uniqueId, TYPE_TELEPORT);
+    }
+
+    /**
+     * Retrieves complete player data including all locations and settings.
+     *
+     * @param playerId The UUID of the player
+     * @return PlayerData object containing all player-specific data, or null if no data exists
+     */
+    @Override
+    public PlayerData getPlayerData(UUID playerId) {
+        PlayerData data = new PlayerData();
+        boolean hasData = false;
+        
+        // Get all location types for this player
+        String sql = "SELECT location_type, world, x, y, z, yaw, pitch FROM " + TABLE_PLAYER_LOCATIONS + " WHERE player_uuid = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, playerId.toString());
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                String locationType = rs.getString("location_type");
+                Location location = createLocationFromResultSet(rs);
+                
+                if (location != null) {
+                    hasData = true;
+                    switch (locationType) {
+                        case TYPE_DEATH:
+                            data.setLastDeath(location);
+                            break;
+                        case TYPE_TELEPORT:
+                            data.setLastTeleport(location);
+                            break;
+                        case TYPE_LAST:
+                            data.setLastLocation(location);
+                            break;
+                        case TYPE_HOME:
+                            data.setHome(location);
+                            break;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            logger.severe("Failed to retrieve player data for " + playerId + ": " + e.getMessage());
+        }
+        
+        // Get keepXp setting - we'll store this as a player setting
+        sql = "SELECT setting_value FROM pitbully_player_settings WHERE player_uuid = ? AND setting_name = 'keepXp'";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, playerId.toString());
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                String value = rs.getString("setting_value");
+                data.setKeepXp("true".equalsIgnoreCase(value));
+                hasData = true;
+            } else {
+                // Default to true for new players
+                data.setKeepXp(true);
+            }
+        } catch (SQLException e) {
+            // Table might not exist yet, that's okay - use default
+            logger.info("Player settings table not found, using default keepXp value: " + e.getMessage());
+            data.setKeepXp(true);
+        }
+        
+        return hasData ? data : null;
+    }
+
+    /**
+     * Saves complete player data including all locations and settings.
+     *
+     * @param playerId The UUID of the player
+     * @param playerData The PlayerData object containing all data to save
+     */
+    @Override
+    public void savePlayerData(UUID playerId, PlayerData playerData) {
+        if (playerData == null) return;
+        
+        // Save locations
+        if (playerData.getLastDeath() != null) {
+            saveDeathLocation(playerId, playerData.getLastDeath());
+        }
+        if (playerData.getLastTeleport() != null) {
+            saveTeleportLocation(playerId, playerData.getLastTeleport());
+        }
+        if (playerData.getLastLocation() != null) {
+            saveLastLocation(playerId, playerData.getLastLocation());
+        }
+        if (playerData.getHome() != null) {
+            saveHomeLocation(playerId, playerData.getHome());
+        }
+        
+        // Save keepXp setting
+        savePlayerSetting(playerId, "keepXp", String.valueOf(playerData.isKeepXp()));
+    }
+
+    /**
+     * Helper method to save player-specific settings.
+     */
+    private void savePlayerSetting(UUID playerId, String settingName, String value) {
+        // Create table if not exists
+        String createTableSql = "CREATE TABLE IF NOT EXISTS pitbully_player_settings (" +
+                "player_uuid VARCHAR(36) NOT NULL, " +
+                "setting_name VARCHAR(50) NOT NULL, " +
+                "setting_value TEXT, " +
+                "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "PRIMARY KEY (player_uuid, setting_name)" +
+                ")";
+        
+        String upsertSql;
+        if (config.getType() == DatabaseConfig.DatabaseType.MYSQL || config.getType() == DatabaseConfig.DatabaseType.MARIADB) {
+            upsertSql = "INSERT INTO pitbully_player_settings (player_uuid, setting_name, setting_value) " +
+                       "VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = CURRENT_TIMESTAMP";
+        } else if (config.getType() == DatabaseConfig.DatabaseType.POSTGRESQL) {
+            upsertSql = "INSERT INTO pitbully_player_settings (player_uuid, setting_name, setting_value) " +
+                       "VALUES (?, ?, ?) ON CONFLICT (player_uuid, setting_name) " +
+                       "DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = CURRENT_TIMESTAMP";
+        } else { // SQLite
+            upsertSql = "INSERT OR REPLACE INTO pitbully_player_settings (player_uuid, setting_name, setting_value) " +
+                       "VALUES (?, ?, ?)";
+        }
+        
+        try (Connection conn = dataSource.getConnection()) {
+            // Create table
+            try (PreparedStatement createStmt = conn.prepareStatement(createTableSql)) {
+                createStmt.executeUpdate();
+            }
+            
+            // Upsert setting
+            try (PreparedStatement stmt = conn.prepareStatement(upsertSql)) {
+                stmt.setString(1, playerId.toString());
+                stmt.setString(2, settingName);
+                stmt.setString(3, value);
+                stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            logger.severe("Failed to save player setting " + settingName + " for " + playerId + ": " + e.getMessage());
+        }
     }
 
     

@@ -70,6 +70,10 @@ commands:
     description: Deny the pending teleport request
     usage: /tpdeny
     permission: pitbullyplugin.tpdeny
+  keepxp:
+    description: Toggle keeping XP on death
+    usage: /keepxp [on|off] [player]
+    permission: pitbullyplugin.keepxp
 
 permissions:
   pitbullyplugin.home:
@@ -92,13 +96,13 @@ permissions:
     default: true
   pitbullyplugin.setwarp:
     description: Allows the player to set warp points
-    default: op
+    default: true
   pitbullyplugin.warp:
     description: Allows the player to use warp points
     default: true
   pitbullyplugin.delwarp:
     description: Allows the player to delete warp points
-    default: op
+    default: true
   pitbullyplugin.enderchest:
     description: Allows the player to access their own enderchest
     default: true
@@ -110,13 +114,16 @@ permissions:
     default: true
   pitbullyplugin.setworldspawn:
     description: Allows the player to set the world spawn location
-    default: op
+    default: true
   pitbullyplugin.keepxp:
     description: Allows the player to keep experience on death
     default: true
+  pitbullyplugin.keepxp.others:
+    description: Allows the player to modify keepXP for other players
+    default: op
   pitbullyplugin.info:
     description: Allows the player to view detailed plugin information
-    default: op
+    default: true
   pitbullyplugin.tpa:
     description: Allows the player to send teleport requests
     default: true

@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import de.pitbully.pitbullyplugin.utils.PlayerData;
 
 class LocationManagerTest {
 
@@ -48,6 +51,26 @@ class LocationManagerTest {
         public boolean hasLastDeathLocation(UUID uniqueId) { return deaths.containsKey(uniqueId); }
         public boolean hasLastTeleportLocation(UUID uniqueId) { return teleports.containsKey(uniqueId); }
         public Location getLastTeleportLocation(UUID uniqueId) { return teleports.get(uniqueId); }
+        
+        // PlayerData methods
+        private Map<UUID, PlayerData> playerDataMap = new HashMap<>();
+        
+        public PlayerData getPlayerData(UUID playerId) {
+            return playerDataMap.get(playerId); // Return null if no data exists
+        }
+        
+        public void savePlayerData(UUID playerId, PlayerData playerData) {
+            if (playerData == null) {
+                playerDataMap.remove(playerId);
+            } else {
+                playerDataMap.put(playerId, playerData);
+                // Also update individual location maps for compatibility
+                if (playerData.getLastDeath() != null) deaths.put(playerId, playerData.getLastDeath());
+                if (playerData.getLastTeleport() != null) teleports.put(playerId, playerData.getLastTeleport());
+                if (playerData.getLastLocation() != null) lasts.put(playerId, playerData.getLastLocation());
+                if (playerData.getHome() != null) homes.put(playerId, playerData.getHome());
+            }
+        }
     }
 
     World world;
@@ -88,5 +111,58 @@ class LocationManagerTest {
         assertThat(LocationManager.getWarpHashMap()).containsEntry("spawn", warp);
         LocationManager.deleteWarpLocation("spawn");
         assertThat(LocationManager.checkWarpLocation("spawn")).isFalse();
+    }
+
+    @Test
+    void testPlayerDataOperations() {
+        UUID id = UUID.randomUUID();
+        Location home = new Location(world, 10, 70, 20);
+        Location death = new Location(world, 5, 60, 15);
+        
+        // Create and save PlayerData
+        PlayerData originalData = new PlayerData();
+        originalData.setHome(home);
+        originalData.setLastDeath(death);
+        originalData.setKeepXp(true);
+        
+        LocationManager.getStorage().savePlayerData(id, originalData);
+        
+        // Retrieve and verify PlayerData
+        PlayerData retrievedData = LocationManager.getStorage().getPlayerData(id);
+        assertThat(retrievedData).isNotNull();
+        assertThat(retrievedData.getHome()).isEqualTo(home);
+        assertThat(retrievedData.getLastDeath()).isEqualTo(death);
+        assertThat(retrievedData.isKeepXp()).isTrue();
+    }
+
+    @Test
+    void testPlayerDataWithNullData() {
+        UUID id = UUID.randomUUID();
+        
+        // Test saving null (should handle gracefully)
+        LocationManager.getStorage().savePlayerData(id, null);
+        
+        // Test retrieving non-existent data
+        PlayerData data = LocationManager.getStorage().getPlayerData(id);
+        assertThat(data).isNull();
+    }
+
+    @Test
+    void testPlayerDataIsKeepingXpIntegration() {
+        UUID id = UUID.randomUUID();
+        Player mockPlayer = Mockito.mock(Player.class);
+        Mockito.when(mockPlayer.getUniqueId()).thenReturn(id);
+        Mockito.when(mockPlayer.hasPermission("pitbullyplugin.keepxp")).thenReturn(true);
+        
+        // Initially no data - should default to true
+        assertThat(LocationStorage.isKeepingXp(mockPlayer)).isTrue();
+        
+        // Set keepXp to false via PlayerData
+        PlayerData data = new PlayerData();
+        data.setKeepXp(false);
+        LocationManager.getStorage().savePlayerData(id, data);
+        
+        // Should now return false
+        assertThat(LocationStorage.isKeepingXp(mockPlayer)).isFalse();
     }
 }

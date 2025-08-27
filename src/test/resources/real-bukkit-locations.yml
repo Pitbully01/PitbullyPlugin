@@ -1,0 +1,87 @@
+# Real anonymized locations.yml from PitbullyPlugin v1.6.0
+# Used for integration testing with MockBukkit server
+# This version uses proper Bukkit Location serialization format
+
+# Player data structure used by v1.6.1+
+players:
+  a1b2c3d4-1111-4444-8888-000000000001:
+    keepXp: true
+    home:
+      ==: org.bukkit.Location
+      world: world
+      x: 189.47878411582298
+      y: 64.0
+      z: -41.1457465816564
+      pitch: 26.850065
+      yaw: -89.40005
+    lastDeath:
+      ==: org.bukkit.Location
+      world: world
+      x: 338.7112613644273
+      y: 76.0
+      z: -197.79562057506362
+      pitch: 34.349953
+      yaw: -129.90042
+    lastTeleport:
+      ==: org.bukkit.Location
+      world: world
+      x: 192.5
+      y: 64.0
+      z: -42.5
+      pitch: 0.0
+      yaw: -180.0
+    lastLocation:
+      ==: org.bukkit.Location
+      world: world
+      x: 192.5
+      y: 64.0
+      z: -42.5
+      pitch: 0.0
+      yaw: -180.0
+  a1b2c3d4-2222-4444-8888-000000000002:
+    keepXp: false
+    home:
+      ==: org.bukkit.Location
+      world: world
+      x: 189.64568052269811
+      y: 64.0
+      z: -43.4453039151906
+      pitch: 1.0014238
+      yaw: 89.95996
+
+# Server warps from real production data
+warps:
+  cave_entrance:
+    ==: org.bukkit.Location
+    world: world
+    x: 312.6785143745211
+    y: 68.0
+    z: -41.08264733346452
+    pitch: 20.100155
+    yaw: -52.789062
+  farm_area:
+    ==: org.bukkit.Location
+    world: world
+    x: 150.79991973626537
+    y: 64.0
+    z: 4.636693062415068
+    pitch: 24.299902
+    yaw: -73.49829
+  mining_spot:
+    ==: org.bukkit.Location
+    world: world
+    x: 43.61653454455055
+    y: 126.0
+    z: 85.9310068785862
+    pitch: 6.2999578
+    yaw: -159.00104
+
+# Legacy format sections (should be migrated)
+worldSpawnLocation:
+  ==: org.bukkit.Location
+  world: world
+  x: 175.40310799163566
+  y: 64.0
+  z: -50.912283160304185
+  pitch: 0.49617073
+  yaw: -45.374237

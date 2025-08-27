@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.Test;
 
+import de.pitbully.pitbullyplugin.utils.PlayerData;
+
 class FileLocationStorageTest {
 
     @Test
@@ -92,6 +94,128 @@ class FileLocationStorageTest {
             assertThat(cfg.getConfigurationSection("lastTeleportLocations")).isNull();
             assertThat(cfg.getConfigurationSection("lastLocations")).isNull();
             assertThat(cfg.getConfigurationSection("homeLocations")).isNull();
+        } finally {
+            try { new File(tempDir, "locations.yml").delete(); } catch (Exception ignored) {}
+            try { tempDir.delete(); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    void testPlayerDataOperations() throws Exception {
+        File tempDir = Files.createTempDirectory("pitbully-playerdata-test").toFile();
+        try {
+            Logger logger = Logger.getLogger("Test");
+            FileLocationStorage storage = new FileLocationStorage(tempDir, logger);
+
+            UUID playerId = UUID.randomUUID();
+            Location testLocation = new Location(null, 100, 64, -50);
+
+            // Create PlayerData
+            PlayerData originalData = new PlayerData();
+            originalData.setLastDeath(testLocation);
+            originalData.setLastTeleport(testLocation);
+            originalData.setLastLocation(testLocation);
+            originalData.setHome(testLocation);
+            originalData.setKeepXp(true);
+
+            // Save PlayerData
+            storage.savePlayerData(playerId, originalData);
+
+            // Retrieve PlayerData
+            PlayerData retrievedData = storage.getPlayerData(playerId);
+
+            assertThat(retrievedData).isNotNull();
+            assertThat(retrievedData.getLastDeath()).isEqualTo(testLocation);
+            assertThat(retrievedData.getLastTeleport()).isEqualTo(testLocation);
+            assertThat(retrievedData.getLastLocation()).isEqualTo(testLocation);
+            assertThat(retrievedData.getHome()).isEqualTo(testLocation);
+            assertThat(retrievedData.isKeepXp()).isTrue();
+
+        } finally {
+            try { new File(tempDir, "locations.yml").delete(); } catch (Exception ignored) {}
+            try { tempDir.delete(); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    void testPlayerDataWithNullData() throws Exception {
+        File tempDir = Files.createTempDirectory("pitbully-playerdata-null-test").toFile();
+        try {
+            Logger logger = Logger.getLogger("Test");
+            FileLocationStorage storage = new FileLocationStorage(tempDir, logger);
+
+            UUID playerId = UUID.randomUUID();
+
+            // Test saving null PlayerData (should handle gracefully)
+            storage.savePlayerData(playerId, null);
+
+            // Test getting non-existent PlayerData
+            PlayerData retrievedData = storage.getPlayerData(playerId);
+            assertThat(retrievedData).isNull();
+
+        } finally {
+            try { new File(tempDir, "locations.yml").delete(); } catch (Exception ignored) {}
+            try { tempDir.delete(); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    void testPlayerDataPersistence() throws Exception {
+        File tempDir = Files.createTempDirectory("pitbully-playerdata-persistence-test").toFile();
+        try {
+            Logger logger = Logger.getLogger("Test");
+            UUID playerId = UUID.randomUUID();
+            Location testLocation = new Location(null, 25, 80, 15);
+
+            // Create and save data with first storage instance
+            {
+                FileLocationStorage storage = new FileLocationStorage(tempDir, logger);
+                PlayerData data = new PlayerData();
+                data.setHome(testLocation);
+                data.setKeepXp(false); // Set to non-default value
+                storage.savePlayerData(playerId, data);
+                storage.saveAll();
+            }
+
+            // Load data with new storage instance
+            {
+                FileLocationStorage storage = new FileLocationStorage(tempDir, logger);
+                PlayerData retrievedData = storage.getPlayerData(playerId);
+
+                assertThat(retrievedData).isNotNull();
+                assertThat(retrievedData.getHome()).isEqualTo(testLocation);
+                assertThat(retrievedData.isKeepXp()).isFalse(); // Should persist non-default value
+            }
+
+        } finally {
+            try { new File(tempDir, "locations.yml").delete(); } catch (Exception ignored) {}
+            try { tempDir.delete(); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    void testMigrationWithKeepXpDefaults() throws Exception {
+        File tempDir = Files.createTempDirectory("pitbully-migration-keepxp-test").toFile();
+        try {
+            // Create legacy format without keepXp
+            File locations = new File(tempDir, "locations.yml");
+            YamlConfiguration legacy = new YamlConfiguration();
+            UUID id = UUID.randomUUID();
+            String uuid = id.toString();
+            Location loc = new Location(null, 5, 65, 10);
+            legacy.set("homeLocations." + uuid, loc);
+            legacy.save(locations);
+
+            // Initialize storage and load
+            Logger logger = Logger.getLogger("Test");
+            FileLocationStorage storage = new FileLocationStorage(tempDir, logger);
+
+            // Get PlayerData - should have migrated home and default keepXp
+            PlayerData data = storage.getPlayerData(id);
+            assertThat(data).isNotNull();
+            assertThat(data.getHome()).isEqualTo(loc);
+            assertThat(data.isKeepXp()).isTrue(); // Should default to true for migrated data
+
         } finally {
             try { new File(tempDir, "locations.yml").delete(); } catch (Exception ignored) {}
             try { tempDir.delete(); } catch (Exception ignored) {}

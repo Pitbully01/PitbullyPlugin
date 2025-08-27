@@ -21,6 +21,7 @@ public class PlayerData {
     private Location lastTeleport;
     private Location lastLocation;
     private Location home;
+    private boolean keepXp = true; // Default to true for new players
 
     public Location getLastDeath() {
         return lastDeath;
@@ -55,12 +56,25 @@ public class PlayerData {
     }
 
     public boolean isEmpty() {
-        return lastDeath == null && lastTeleport == null && lastLocation == null && home == null;
+        // PlayerData is considered empty only if all data is at default values
+        // This means all locations are null AND keepXp is true (the default)
+        return lastDeath == null && lastTeleport == null && lastLocation == null && home == null && keepXp == true;
+    }
+    public boolean isKeepXp() {
+        return keepXp;
+    }
+
+    public void setKeepXp(boolean keepXp) {
+        this.keepXp = keepXp;
+    }
+
+    public void toggleSetKeepXp() {
+        this.keepXp = !keepXp;
     }
 
     /**
      * Writes this PlayerData into the provided configuration section.
-     * Keys: lastDeath, lastTeleport, lastLocation, home
+     * Keys: lastDeath, lastTeleport, lastLocation, home, keepXp
      */
     public void toConfig(ConfigurationSection section) {
         if (section == null) return;
@@ -68,6 +82,7 @@ public class PlayerData {
         section.set("lastTeleport", lastTeleport);
         section.set("lastLocation", lastLocation);
         section.set("home", home);
+        section.set("keepXp", keepXp);
     }
 
     /**
@@ -80,10 +95,13 @@ public class PlayerData {
         Object teleport = section.get("lastTeleport");
         Object last = section.get("lastLocation");
         Object home = section.get("home");
+        Object keepXp = section.get("keepXp");
         if (death instanceof Location) data.setLastDeath((Location) death);
         if (teleport instanceof Location) data.setLastTeleport((Location) teleport);
         if (last instanceof Location) data.setLastLocation((Location) last);
         if (home instanceof Location) data.setHome((Location) home);
+        if (keepXp instanceof Boolean) data.setKeepXp((Boolean) keepXp);
+        else data.setKeepXp(true); // Default to true for new players
         return data;
     }
 }

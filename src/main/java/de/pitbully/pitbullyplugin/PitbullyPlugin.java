@@ -5,6 +5,7 @@ import de.pitbully.pitbullyplugin.commands.DelHomeCommand;
 import de.pitbully.pitbullyplugin.commands.DelWarpCommand;
 import de.pitbully.pitbullyplugin.commands.EnderchestCommand;
 import de.pitbully.pitbullyplugin.commands.HomeCommand;
+import de.pitbully.pitbullyplugin.commands.KeepXpCommand;
 import de.pitbully.pitbullyplugin.commands.PluginInfoCommand;
 import de.pitbully.pitbullyplugin.commands.SetHomeCommand;
 import de.pitbully.pitbullyplugin.commands.SetWarpCommand;
@@ -56,7 +57,7 @@ import java.util.logging.Level;
  * @version 1.6.1
  * @since 1.0.0
  */
-public final class PitbullyPlugin extends JavaPlugin {
+public class PitbullyPlugin extends JavaPlugin {
     
     /** The singleton instance of the plugin */
     private static PitbullyPlugin instance;
@@ -250,6 +251,7 @@ public final class PitbullyPlugin extends JavaPlugin {
         registerCommand("tpdeny", new TpDenyCommand());
         registerCommand("tpa", new TpaCommand());
         registerCommand("tpahere", new TpaHereCommand());
+        registerCommand("keepxp", new KeepXpCommand());
     }
     
     /**
